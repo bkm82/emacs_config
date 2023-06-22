@@ -1,0 +1,10 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("org-refile-last-stored"
+ (filename . "~/org-mode-playground/Numbered-Headings.org")
+ (front-context-string . "** Test L2 Headi")
+ (rear-context-string . "st L2 Heading 3\n")
+ (position . 2945))
+)

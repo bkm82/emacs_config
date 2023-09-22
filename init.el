@@ -4,7 +4,7 @@
   (defvar efs/default-variable-font-size 150)
 
 ;; Make frame transparency overridable
-(defvar efs/frame-transparency '(90 . 90))
+(defvar efs/frame-transparency '(10 . 10))
 
 ;; e default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
@@ -82,7 +82,8 @@
                   term-mode-hook
                   shell-mode-hook
                   treemacs-mode-hook
-                  eshell-mode-hook))
+                  eshell-mode-hook
+                  doc-view-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil :font "Fira Code Retina" :height efs/default-font-size)
@@ -114,7 +115,9 @@
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  :custom ((doom-modeline-height 55)
+           (doom-modeline-vcs-max-lenght 15)
+           ))
 
 (use-package which-key
   :defer 0
@@ -424,6 +427,7 @@
           ("b"  . pdf-view-set-slice-from-bounding-box)
           ("r"  . pdf-view-reset-slice)))
 
+ (setq revert-without-query '(".pdf"))
 
  (setq org-latex-listings 'minted
        org-latex-packages-alist '(("" "minted"))

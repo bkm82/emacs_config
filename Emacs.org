@@ -1,6 +1,7 @@
 
 
 
+
 #+title: Emacs Configuration File 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
@@ -16,7 +17,7 @@ This is the configuration based on the "emacs from scratch" configuration
     (defvar efs/default-variable-font-size 150)
 
   ;; Make frame transparency overridable
-  (defvar efs/frame-transparency '(90 . 90))
+  (defvar efs/frame-transparency '(10 . 10))
 
 #+end_src
 
@@ -111,34 +112,35 @@ This section configures basic UI settings that remove unneeded elements to make 
 
 #+begin_src emacs-lisp
 
-  (setq inhibit-startup-message t)
+    (setq inhibit-startup-message t)
 
-  (scroll-bar-mode -1)        ; Disable visible scrollbar
-  (tool-bar-mode -1)          ; Disable the toolbar
-  (tooltip-mode -1)           ; Disable tooltips
-  (set-fringe-mode 10)        ; Give some breathing room
+    (scroll-bar-mode -1)        ; Disable visible scrollbar
+    (tool-bar-mode -1)          ; Disable the toolbar
+    (tooltip-mode -1)           ; Disable tooltips
+    (set-fringe-mode 10)        ; Give some breathing room
 
-  (menu-bar-mode -1)            ; Disable the menu bar
+    (menu-bar-mode -1)            ; Disable the menu bar
 
-  ;; Set up the visible bell
-  (setq visible-bell t)
+    ;; Set up the visible bell
+    (setq visible-bell t)
 
-  (column-number-mode)
-  (global-display-line-numbers-mode t)
+    (column-number-mode)
+    (global-display-line-numbers-mode t)
 
-    ;; Set frame transparency
-  (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
-  (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
-  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+      ;; Set frame transparency
+    (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
+    (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
+    (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+    (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-    ;; Disable line numbers for some modes
-    (dolist (mode '(org-mode-hook
-                    term-mode-hook
-                    shell-mode-hook
-                    treemacs-mode-hook
-                    eshell-mode-hook))
-      (add-hook mode (lambda () (display-line-numbers-mode 0))))
+      ;; Disable line numbers for some modes
+      (dolist (mode '(org-mode-hook
+                      term-mode-hook
+                      shell-mode-hook
+                      treemacs-mode-hook
+                      eshell-mode-hook
+                      doc-view-mode-hook))
+        (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 #+end_src
 
@@ -198,13 +200,17 @@ This section configures basic UI settings that remove unneeded elements to make 
 
 #+begin_src emacs-lisp
 
-(use-package all-the-icons)
+  (use-package all-the-icons)
 
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :custom ((doom-modeline-height 55)
+             (doom-modeline-vcs-max-lenght 15)
+             ))
 
 #+end_src
+
+#+RESULTS:
 
 ** Which Key
 
@@ -576,56 +582,57 @@ You can add more =src= block templates below by copying one of the lines and cha
 
 ** Latex Export
 #+begin_src emacs-lisp
-  ;; Setup a plain Latex class as shown https://www.reddit.com/r/orgmode/comments/lzsygs/perfect_org_mode_exports_to_latex_easy_extensible/
-  (with-eval-after-load 'ox-latex
-    (add-to-list 'org-latex-classes
-                 '("org-plain-latex"
-                   "\\documentclass{article}
-               [NO-DEFAULT-PACKAGES]
-               [PACKAGES]
-               [EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+   ;; Setup a plain Latex class as shown https://www.reddit.com/r/orgmode/comments/lzsygs/perfect_org_mode_exports_to_latex_easy_extensible/
+   (with-eval-after-load 'ox-latex
+     (add-to-list 'org-latex-classes
+                  '("org-plain-latex"
+                    "\\documentclass{article}
+                [NO-DEFAULT-PACKAGES]
+                [PACKAGES]
+                [EXTRA]"
+                    ("\\section{%s}" . "\\section*{%s}")
+                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
- ; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+  ; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
-  (use-package pdf-tools
-     :defer t
-     :config
-         (pdf-tools-install)
-         (setq-default pdf-view-display-size 'fit-page)
-     :bind (:map pdf-view-mode-map
-           ("\\" . hydra-pdftools/body)
-           ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-           ("g"  . pdf-view-first-page)
-           ("G"  . pdf-view-last-page)
-           ("l"  . image-forward-hscroll)
-           ("h"  . image-backward-hscroll)
-           ("j"  . pdf-view-next-page)
-           ("k"  . pdf-view-previous-page)
-           ("e"  . pdf-view-goto-page)
-           ("u"  . pdf-view-revert-buffer)
-           ("al" . pdf-annot-list-annotations)
-           ("ad" . pdf-annot-delete)
-           ("aa" . pdf-annot-attachment-dired)
-           ("am" . pdf-annot-add-markup-annotation)
-           ("at" . pdf-annot-add-text-annotation)
-           ("y"  . pdf-view-kill-ring-save)
-           ("i"  . pdf-misc-display-metadata)
-           ("s"  . pdf-occur)
-           ("b"  . pdf-view-set-slice-from-bounding-box)
-           ("r"  . pdf-view-reset-slice)))
+   (use-package pdf-tools
+      :defer t
+      :config
+          (pdf-tools-install)
+          (setq-default pdf-view-display-size 'fit-page)
+      :bind (:map pdf-view-mode-map
+            ("\\" . hydra-pdftools/body)
+            ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+            ("g"  . pdf-view-first-page)
+            ("G"  . pdf-view-last-page)
+            ("l"  . image-forward-hscroll)
+            ("h"  . image-backward-hscroll)
+            ("j"  . pdf-view-next-page)
+            ("k"  . pdf-view-previous-page)
+            ("e"  . pdf-view-goto-page)
+            ("u"  . pdf-view-revert-buffer)
+            ("al" . pdf-annot-list-annotations)
+            ("ad" . pdf-annot-delete)
+            ("aa" . pdf-annot-attachment-dired)
+            ("am" . pdf-annot-add-markup-annotation)
+            ("at" . pdf-annot-add-text-annotation)
+            ("y"  . pdf-view-kill-ring-save)
+            ("i"  . pdf-misc-display-metadata)
+            ("s"  . pdf-occur)
+            ("b"  . pdf-view-set-slice-from-bounding-box)
+            ("r"  . pdf-view-reset-slice)))
+  
+   (setq revert-without-query '(".pdf"))
 
-
-  (setq org-latex-listings 'minted
-        org-latex-packages-alist '(("" "minted"))
-        org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+   (setq org-latex-listings 'minted
+         org-latex-packages-alist '(("" "minted"))
+         org-latex-pdf-process
+         '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 #+end_src
 

@@ -1,0 +1,309 @@
+* Action Items
+** HW
+** Other
+*** DONE Learn how to add code into org mode
+*** TODO Learn how to cycle agenda items
+
+* 8-29-2023
+
+
+
+** Office 102
+** DONE Learn verctorized functions (sapply, tapply, apply)
+** R is 1 based index
+** writing custom functions
+funtion.name<- function(arguments){
+    for (){}
+    return()
+}
+** Select (get rid of columns we dont want)
+** Filter (Get rid of rows we dont want)
+
+** Plotting( use ggplot2)
+
+** Piping using %>% will pipe a varaible into the need
+
+* 9-5-2023
+** Statistical learning (review from last lecture)
+*** Computational heavy
+*** modern
+*** Supervised and unsupervised
+*** Supervised (There is a response) vs unsupervised (no response)
+*** flexibility vs interpretility (inversaly corelated)
+** class notes
+R example
+
+#+BEGIN_SRC R :results value :exports results :colnames yes :hline :session test
+  set.seed(578)
+  n = 500
+  x = runif(n,-1,1)
+  true.function = function(x) {(1+x^2}
+#+END_SRC
+* 9-7-2023
+** K nearest neighbors
+*** Non-parametric (does not assume a shape of the function that it is trying to aproximate)
+*** Used for supervized learning (needs a response)
+*** Can be used for either clasification
+**** clasification entails predicting the class of the k nearest neighbors
+**** regression entails taking the mean response of the k nearest neighbors
+
+** example code
+
+#+name: Question 1
+#+BEGIN_SRC R :results value :exports results :colnames yes :hline :session test
+  ### k-nn
+  rm(list=ls())
+  library(ggplot2)
+  # We have a dataset of 6 and want to classify a test point using k = 1.
+
+  df <- data.frame(x1=c(5.97,4.05,3.09,2.11,4.39,3.95),
+                   x2=c(4.22,1.82,2.62,3.94,4.57,2.40),
+                   y=c(1,0,0,0,1,0))
+  df$y <- as.factor(df$y)
+
+  test_point <- data.frame(x1=5.5,x2=2.5)
+
+  #df %>%
+  #  ggplot(aes(x=x1, y=x2))+
+  #  geom_point(aes(col=y), size=3)+
+  #  geom_point(aes(x=5.5,y=2.5), col="red", shape = "x", size=5)+
+  #  scale_color_manual(values=c("navy", "gold"))+
+  #  theme_bw()
+
+#+END_SRC
+
+#+RESULTS: Question 1
+|  x1 |  x2 |
+|-----+-----|
+| 5.5 | 2.5 |
+
+
+ #+name: Question 2
+ #+BEGIN_SRC R :results value :exports results :colnames yes :hline :session test
+   library(caret)
+
+   library(ISLR2)
+   data(Boston)
+
+   # drop chas and rad for ease of use
+   my.boston <-
+     Boston %>% select(-c("chas", "rad"))
+
+   # scale the data
+   my.boston[,1:(ncol(my.boston)-1)] = scale(my.boston[,1:(ncol(my.boston)-1)])
+
+   # remove test area
+   test_area <- my.boston[46,]
+   my.boston <- my.boston[-46,]
+
+   # find the 5 nn for the test area
+   knn.fit <- knnreg(my.boston[,(1:ncol(my.boston)-1)],my.boston[,ncol(my.boston)], k=5)
+   pred_y <- predict(knn.fit, test_area[,(1:ncol(my.boston)-1)])
+   pred_y
+   test_area[,ncol(my.boston)]
+
+   # find the 20 nn for the test area
+   knn.fit <- knnreg(my.boston[,(1:ncol(my.boston)-1)],my.boston[,ncol(my.boston)], k=20)
+   pred_y <- predict(knn.fit, test_area[,(1:ncol(my.boston)-1)])
+   pred_y
+   test_area[,ncol(my.boston)]
+
+ #+END_SRC
+
+ #+RESULTS: Question 2
+ : Could not parse R result
+
+* 9-12-2023
+** Curse of dimensionality
+*** as your dimensions go up, your points shift further away and shift towards a single bins
+*** Linear regression
+Ordinary least squares is the maximum likelyhood estimator
+most common way to determine how well a model fits is the coefficent of determination
+R^2 = (1- RSS/TSS) (residual sum of squares/ total sum of squares)
+*** One-hot encoding
+If you have a catagorical factor such as the example below the linear regression, the catagorical factor will only impact the slope
+
+| league | payrol | wins |
+|--------+--------+------|
+| NL     |     10 |   12 |
+| AL     |     12 |   40 |
+|        |        |      |
+onehot encoding is to predict catagorical models using a linear model. 
+One hot encoding is making a colum for each catagorical colum (1 if a match, otherwise 0)
+
+| Team | Team A | Team B |
+|------+--------+--------|
+| A    |      1 |      0 |
+| A    |      1 |      0 |
+| B    |      0 |      1 |
+| A    |      1 |      0 |
+| C    |      0 |      0 |
+
+You dont need Team c as it is Team C if team a or b is not predicted
+
+MAE(Mean Absolut Error) (y yhat) = 1/m sum(i=1 to m) (y_i - yhat_i)
+MSE (Mean Square Error) MSE(y yhat) = 1/m sum(i=1 to m) (y_i - yhat_i)^2
+RMSE (Root Mean Squared Error)= sqrt(MSE)
+
+*** Code examples
+#+BEGIN_SRC R :results none :exports both :session lecture-notes-term :colnames yes
+   ### linear regression
+  rm(list=ls())
+
+  #########################################################################
+  # set working directory to location of the current script
+  setwd("~/masters/computational-statistics/lecture-notes")
+  #########################################################################
+  # other useful libraries
+  library(dplyr)
+  library(ggplot2)
+  library(ModelMetrics)
+
+
+#+END_SRC
+
+
+# load data
+#+BEGIN_SRC R :results output :exports both :session lecture-notes-term :colnames yes
+  diabetes <- read.csv("diabetes.train.csv")
+  diabetes$SEX <- as.factor(diabetes$SEX)
+  str(diabetes)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+'data.frame':	49 obs. of  11 variables:
+ $ AGE: int  66 25 32 46 61 64 65 60 53 60 ...
+ $ SEX: Factor w/ 2 levels "1","2": 2 2 1 1 1 2 2 2 1 2 ...
+ $ BMI: num  26.2 24.3 30.5 24.9 25.8 27.3 30.2 23.4 22 27.5 ...
+ $ BP : num  114 95 89 115 98 109 98 88 94 106 ...
+ $ S1 : int  255 162 182 198 235 186 219 153 175 229 ...
+ $ S2 : num  185 98.6 110.6 129.6 125.8 ...
+ $ S3 : int  56 54 56 54 76 38 40 58 59 51 ...
+ $ S4 : num  4.55 3 3 4 3 5 5 3 3 4 ...
+ $ S5 : num  4.25 3.85 4.34 4.28 5.11 ...
+ $ S6 : int  92 87 89 103 82 99 84 95 98 91 ...
+ $ Y  : int  63 49 129 104 134 150 198 104 200 235 ...
+#+end_example
+
+
+# lm fit
+#+BEGIN_SRC R :results output :exports both :session lecture-notes-term :colnames yes
+
+#+END_SRC
+
+# interpretation
+#+BEGIN_SRC R :results output :exports both :session lecture-notes-term :colnames yes
+  lm.fit <- (Y~., data=diabetes)
+  summary(lm.fit)
+#+END_SRC
+
+#+RESULTS:
+: Error in fit(Y ~ ., data = diabetes) : could not find function "fit"
+: Error in object[[i]] : object of type 'closure' is not subsettable
+
+
+
+# r2
+#+BEGIN_SRC R :results output :exports both :session lecture-notes-term :colnames yes
+
+#+END_SRC
+
+
+
+# evaluation metrics
+#+BEGIN_SRC R :results output :exports both :session lecture-notes-term :colnames yes
+
+#+END_SRC
+
+
+* 9-19-2023
+** Recap
+*** Clasification accuracy CA(y_hat, y) = 1/n* $sigma$
+
+** code
+#+ATTR_LATEX :options frame=single
+#+BEGIN_SRC R :results output :exports both :session R-session 
+  library(dplyr)
+  library(ggplot2)
+  library(pROC)
+  library(ModelMetrics)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+Type 'citation("pROC")' for a citation.
+
+Attaching package: ‘pROC’
+
+The following objects are masked from ‘package:stats’:
+
+    cov, smooth, var
+
+Attaching package: ‘ModelMetrics’
+
+The following object is masked from ‘package:pROC’:
+
+    auc
+
+The following object is masked from ‘package:base’:
+
+    kappa
+#+end_example
+
+  ### logistic regression
+  data("Default")
+  Default$default <- ifelse(Default$default=="No", 0, 1)
+
+  ### remove last 100 observations to test
+  Default.test <- Default[9901:nrow(Default),]
+  Default <- Default[1:9900,]
+
+
+### fit model
+
+  ### plot the data and model
+
+  ### predict the test points
+
+
+
+  ### metrics
+  # confusion matrix
+
+  confusionMatrix(Default.test$default, predictions)
+  #calculate sensitivity
+  sensitivity(Default.test$default, predictions)
+  #calculate specificity
+  specificity(Default.test$default, predictions)
+
+  ### roc curve
+  #in pROC package above
+  myROC <- roc(Default.test$default, predictions)
+  ggroc(myROC)
+  myROC$auc
+  ### multiple logistic regression
+  data("Default")
+  Default$default <- ifelse(Default$default=="No", 0, 1)
+
+  ### remove last 100 observations to test
+  Default.test <- Default[9901:nrow(Default),]
+  Default <- Default[1:9900,]
+
+  ### fit model
+
+  ### predict the test points
+
+  ### metrics
+
+#+END_SRC

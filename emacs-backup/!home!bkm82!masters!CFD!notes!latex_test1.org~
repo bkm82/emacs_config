@@ -1,0 +1,54 @@
+#+TITLE: LATEX TEST FILE
+#+AUTHOR: Bray Moll
+#+SETUPFILE: ~/masters/bray-standard-latex-export.org
+#+OPTIONS: toc:nil
+#+PROPERTY: results output
+* Heading One
+** LaTex test doxument. If i am typing and want an equation $e^5 + 3={i\pi}$
+in this subheading i want to put some text
+THen i want to add some source code
+
+Some notes on exporting, you can export (code, results, both (set as default in the setup file)
+or none
+#+ATTR_LATEX: :options frame=single :float nil
+#+BEGIN_SRC R :results value :exports code :colnames yes :hline :session test
+
+  rm(list=ls())
+  library(MASS)
+  library(dplyr)
+  library(ggplot2)
+
+
+#+END_SRC
+
+#+RESULTS:
+| x         |
+|-----------|
+| ggplot2   |
+| dplyr     |
+| MASS      |
+| stats     |
+| graphics  |
+| grDevices |
+| utils     |
+| datasets  |
+| methods   |
+| base      |
+
+
+#+name: Question 1
+#+BEGIN_SRC R :results value :file myplot.png :exports both :session test
+  birthwt <- birthwt %>%
+  mutate(race = factor(race, labels=c("White","Black","Other")),
+         smoke = factor(smoke, labels=c("No Smoke", "Smoke")))
+
+  plot_1 <- ggplot(birthwt, aes(x=bwt)) + geom_histogram()
+  plot_save <- ggsave("myplot.pdf", plot = plot_1)
+  
+#+END_SRC
+
+#+RESULTS: Question 1
+: myplot.pdf
+
+
+

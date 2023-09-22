@@ -1,6 +1,8 @@
 ;Inibit startup message
 (setq inhibit-startup-message t) 
 
+;ensure cursor default is a bar
+(setq-default cursor-type 'bar)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -125,8 +127,108 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
-(use-package evil)
 
+
+(use-package company
+  :config
+  (add-hook 'after-init-hook 'global-company-mode))
+
+(setq company-selection-wrap-around t
+      company-tooltip-align-annotations t
+      company-idle-delay 0.45
+      company-minimum-prefix-length 3
+      company-tooltip-limit 10)
+
+;; Using arrow for moving through buffers
+(global-set-key (kbd "C-x <up>") 'windmove-up)
+(global-set-key (kbd "C-x <down>") 'windmove-down)
+(global-set-key (kbd "C-x <left>") 'windmove-left)
+(global-set-key (kbd "C-x <right>") 'windmove-right)
+
+(org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (org . t)
+     (ditaa . t)
+     (latex . t)
+     (dot . t)
+     (emacs-lisp . t)
+     (gnuplot . t)
+     (screen . nil)
+     (shell . t)
+     (sql . nil)
+     (sqlite . t)))
+
+;; Setup a plain Latex class as shown https://www.reddit.com/r/orgmode/comments/lzsygs/perfect_org_mode_exports_to_latex_easy_extensible/
+(with-eval-after-load 'ox-latex
+  (add-to-list 'org-latex-classes
+	       '("org-plain-latex"
+		 "\\documentclass{article}
+             [NO-DEFAULT-PACKAGES]
+             [PACKAGES]
+             [EXTRA]"
+		 ("\\section{%s}" . "\\section*{%s}")
+		 ("\\subsection{%s}" . "\\subsection*{%s}")
+		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+(use-package pdf-tools
+   :defer t
+   :config
+       (pdf-tools-install)
+       (setq-default pdf-view-display-size 'fit-page)
+   :bind (:map pdf-view-mode-map
+         ("\\" . hydra-pdftools/body)
+         ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+         ("g"  . pdf-view-first-page)
+         ("G"  . pdf-view-last-page)
+         ("l"  . image-forward-hscroll)
+         ("h"  . image-backward-hscroll)
+         ("j"  . pdf-view-next-page)
+         ("k"  . pdf-view-previous-page)
+         ("e"  . pdf-view-goto-page)
+         ("u"  . pdf-view-revert-buffer)
+         ("al" . pdf-annot-list-annotations)
+         ("ad" . pdf-annot-delete)
+         ("aa" . pdf-annot-attachment-dired)
+         ("am" . pdf-annot-add-markup-annotation)
+         ("at" . pdf-annot-add-text-annotation)
+         ("y"  . pdf-view-kill-ring-save)
+         ("i"  . pdf-misc-display-metadata)
+         ("s"  . pdf-occur)
+         ("b"  . pdf-view-set-slice-from-bounding-box)
+         ("r"  . pdf-view-reset-slice)))
+
+;; inside .emacs file
+(setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
+(add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+;; This allos for insertion of code blocks in org mode by pressing their keywork and then tab
+(require 'org-tempo)
+(with-eval-after-load 'org-tempo
+  (tempo-define-template "r-block-with-latex"
+		       '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC R :results output :exports both :session R-session \n    " r "\n#+END_SRC" >)
+                        "<r"
+                        "Insert an r code block with prefences"))
+
+(with-eval-after-load 'org-tempo
+  (tempo-define-template "r-plot-block-with-latex"
+		       '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC R :results graphics file :file FILENAME :exports both :session R-session \n    " r "\n#+END_SRC" >)
+                        "<rp"
+                        "Insert an r code block with prefences"))
+
+(use-package poly-R
+  :ensure t)
 
 
 
@@ -136,9 +238,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files '("~/org-mode-playground/EMACS-Commands.org"))
+ '(org-agenda-files
+   '("~/masters/computational-statistics/lecture-notes/notes.org" "/home/bkm82/org-mode-playground/EMACS-Commands.org"))
  '(package-selected-packages
-   '(evil doom-themes helpful counsel ivy-rich which-key rainbow-delimiters doom-modeline ivy use-package)))
+   '(org-pdfview pdf-tools evil doom-themes helpful counsel ivy-rich which-key rainbow-delimiters doom-modeline ivy use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

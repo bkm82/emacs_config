@@ -1,9 +1,89 @@
 ;;; -*- coding: utf-8; mode: lisp-data -*-
-(("/home/bkm82/.git-emacs-config/info/exclude" . 242)
+(("/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org_archive" . 122)
+ ("/mnt/c/Users/bkm82/Downloads/Chapter_4_script.R" . 707)
+ ("/home/bkm82/masters/computational-statistics/hw/hw3/"
+  (dired-filename . "/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org"))
+ ("/mnt/c/Users/bkm82/Downloads/lda.qda.R" . 702)
+ ("/home/bkm82/masters/computational-statistics/hw/hw2/homework_2_BM.org" . 10667)
+ ("/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org" . 6834)
+ ("/home/bkm82/masters/computational-statistics/lecture-notes/notes.org" . 11500)
+ ("/home/bkm82/.emacs.d/init.el" . 7064)
+ ("/home/bkm82/masters/computational-statistics/hw/hw1/"
+  (dired-filename . "/home/bkm82/masters/computational-statistics/hw/hw1/homework_1.r"))
+ ("/home/bkm82/masters/computational-statistics/hw/hw1/homework1.org" . 5361)
+ ("/home/bkm82/masters/computational-statistics/hw/hw1/homework_1.r" . 481)
+ ("/home/bkm82/masters/computational-statistics/hw/hw1/#homework_1.org#" . 279)
+ ("/mnt/c/Users/bkm82/"
+  (dired-filename . "/mnt/c/Users/bkm82/.OpenFlipper"))
+ ("/home/bkm82/masters/ECMO/Data/CFD-Solutions/Interpolated-File-Series/"
+  (dired-filename . "/home/bkm82/masters/ECMO/Data/CFD-Solutions/Interpolated-File-Series/interpolated_velocity_1200.vtu"))
+ ("/home/bkm82/masters/ECMO/Code/file-conversions/src/file_conversions/vtu_2bin.py" . 6463)
+ ("/home/bkm82/masters/ECMO/Code/file-conversions/src/file_conversions/velocity_interpolation.py" . 895)
+ ("/home/bkm82/masters/ECMO/Code/file-conversions/src/file_conversions/new_mesh_interpolator.py" . 1776)
+ ("/home/bkm82/masters/computational-statistics/test.org" . 1164)
+ ("/home/bkm82/masters/computational-statistics/#test.org#" . 380)
+ ("/home/bkm82/org-mode-playground/EMACS-Commands.org" . 3156)
+ ("/home/bkm82/masters/"
+  (dired-filename . "/home/bkm82/masters/computational-statistics"))
+ ("/home/bkm82/masters/computational-statistics/"
+  (dired-filename . "/home/bkm82/masters/computational-statistics/hw"))
+ ("/home/bkm82/masters/computational-statistics/hw/"
+  (dired-filename . "/home/bkm82/masters/computational-statistics/hw/hw2"))
+ ("/snap/emacs/current/usr/share/emacs/29.1/etc/COPYING" . 2420)
+ ("/home/bkm82/org-mode-playground/indent.org" . 18)
+ ("/home/bkm82/.emacs.d/todo/Todo.todo" . 36)
+ ("/snap/emacs/current/usr/share/emacs/29.1/etc/TODO" . 3038)
+ ("/home/bkm82/masters/computational-statistics/hw/hw2/homework_2_BM.pdf" . 723973)
+ ("/home/bkm82/masters/bray-standard-latex-export.org" . 31)
+ ("/home/bkm82/.emacs.d/"
+  (dired-filename . "/home/bkm82/.emacs.d/init.el"))
+ ("/home/bkm82/masters/CFD/notes/latex_test1.org" . 753)
+ ("/home/bkm82/masters/computational-statistics/lecture-notes/"
+  (dired-filename . "/home/bkm82/masters/computational-statistics/lecture-notes/notes.org"))
+ ("/mnt/c/Users/bkm82/Downloads/ch3_examples.R" . 461)
+ ("/mnt/c/Users/bkm82/Downloads/knn_demo.R" . 3000)
+ ("/mnt/c/Users/bkm82/Downloads/Chapter_1_BasicR.R" . 778)
+ ("/home/bkm82/masters/computational-statistics/lecture-notes/lecture1.r" . 25)
+ ("/home/bkm82/masters/computational-statistics/test.R" . 23)
+ ("/mnt/c/Users/bkm82/Downloads/jake-latex-standard.setup" . 3249)
+ ("/mnt/"
+  (dired-filename . "/mnt/c"))
+ ("/mnt/c/"
+  (dired-filename . "/mnt/c/hp"))
+ ("/home/bkm82/masters/computational-statistics/test2.R" . 23)
+ ("/home/bkm82/.vscode-R/"
+  (dired-filename . "/home/bkm82/.vscode-R/init.R"))
+ ("/home/bkm82/masters/CFD/notes/8_29_23.org" . 71)
+ ("/home/bkm82/fizzbuzz.py" . 211)
+ ("/home/bkm82/masters/ECMO/Code/file-conversions/src/"
+  (dired-filename . "/home/bkm82/masters/ECMO/Code/file-conversions/src/file_conversions"))
+ ("/home/bkm82/masters/ECMO/Code/file-conversions/src/file_conversions/"
+  (dired-filename . "/home/bkm82/masters/ECMO/Code/file-conversions/src/file_conversions/velocity_interpolation.py"))
+ ("/home/bkm82/masters/ECMO/Code/no-slip-paraview-filter/"
+  (dired-filename . "/home/bkm82/masters/ECMO/Code/no-slip-paraview-filter/.git"))
+ ("/home/bkm82/.bashrc" . 3836)
+ ("/mnt/masters/ECMO/Code/Py4SciComp/"
+  (dired-filename . "/mnt/masters/ECMO/Code/Py4SciComp/VTK"))
+ ("/mnt/masters/ECMO/Code/Py4SciComp/VTK/"
+  (dired-filename . "/mnt/masters/ECMO/Code/Py4SciComp/VTK/3-Interpolate-data"))
+ ("/mnt/masters/ECMO/Code/Py4SciComp/VTK/3-Interpolate-data/"
+  (dired-filename . "/mnt/masters/ECMO/Code/Py4SciComp/VTK/3-Interpolate-data/Interpolate_velocity_newmesh.py"))
+ ("/mnt/masters/ECMO/Code/File_Conversions/merge_blocks.py" . 19)
+ ("/mnt/masters/ECMO/Code/Py4SciComp/VTK/3-Interpolate-data/Interpolate_velocity_newmesh.py" . 13)
+ ("/bin/vpn-dns.sh" . 82)
+ ("/home/bkm82/org-mode-playground/server_build.org" . 712)
+ ("/home/bkm82/org-mode-playground/"
+  (dired-filename . "/home/bkm82/org-mode-playground/EMACS-Commands.org"))
+ ("/mnt/c/Users/bkm82/OneDrive - Northern Arizona University/Remote Desktop File Transfer/Patient_18_Boundary_Mesh.msh" . 3)
  ("/home/bkm82/emacs-from-scratch/"
   (dired-filename . "/home/bkm82/emacs-from-scratch/init.el"))
- ("/home/bkm82/emacs-from-scratch/init.el" . 6407)
- ("/home/bkm82/.emacs.d/init.el" . 3405)
+ ("/home/bkm82/emacs-from-scratch/init.el" . 1249)
+ ("/home/bkm82/emacs-from-scratch/Emacs.org" . 46113)
+ ("/home/bkm82/masters/ECMO/Data/"
+  (dired-filename . "/home/bkm82/masters/ECMO/Data/.."))
+ ("/home/bkm82/masters/ECMO/"
+  (dired-filename . "/home/bkm82/masters/ECMO/tests"))
+ ("/mnt/c/Users/bkm82/Documents/ECMO_git_controlled/src/file_conversions/vtu_2bin.py" . 1548)
  ("/home/bkm82/.emacs.d/elpa/evil-20230621.1248/evil-autoloads.el" . 3128)
  ("/home/bkm82/.emacs.d/elpa/goto-chg-20220107.1733/goto-chg-autoloads.el" . 2045)
  ("/home/bkm82/.emacs.d/elpa/doom-themes-20230221.610/doom-themes-autoloads.el" . 20653)
@@ -14,10 +94,6 @@
  ("/home/bkm82/.emacs.d/elpa/ivy-rich-20230425.1422/ivy-rich-autoloads.el" . 2655)
  ("/home/bkm82/.emacs.d/elpa/which-key-20230330.2121/which-key-autoloads.el" . 7363)
  ("/home/bkm82/.emacs.d/elpa/rainbow-delimiters-20210515.1254/rainbow-delimiters-autoloads.el" . 1478)
- ("/home/bkm82/emacs-from-scratch/Emacs.org" . 4461)
- ("/home/bkm82/org-mode-playground/"
-  (dired-filename . "/home/bkm82/org-mode-playground/EMACS-Commands.org"))
- ("/home/bkm82/org-mode-playground/EMACS-Commands.org" . 3637)
  ("/home/bkm82/"
   (dired-filename . "/home/bkm82/.bash_history"))
  ("/home/bkm82/org-mode-playground/Org-Mode-Motion.org" . 328)
@@ -31,6 +107,4 @@
  ("/home/bkm82/.emacs.d/elpa/ivy-20230410.1815/ivy-autoloads.el" . 5334)
  ("/home/bkm82/.emacs.d/elpa/use-package-20230426.2324/use-package-autoloads.el" . 8338)
  ("/home/bkm82/.emacs.d/elpa/bind-key-20230203.2004/bind-key-autoloads.el" . 3792)
- ("/home/bkm82/org-mode-playground/Org-Mode-Commands" . 3152)
- ("/home/bkm82/org-mode-playground/Org-Mode-Numbering" . 2)
- ("/home/bkm82/org-mode-playground/indent.org" . 543))
+ ("/home/bkm82/org-mode-playground/Org-Mode-Numbering" . 2))

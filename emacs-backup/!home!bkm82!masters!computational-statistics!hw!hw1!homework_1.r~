@@ -1,0 +1,5 @@
+                                        #Homework 1 Bray Moll
+#Exercise 1
+# Load the datafile compstats1.RData using load
+compstats = load("compstats1.RData")
+compstats.adult <- as.factor(ifelse(ages<18,"Minor","Adult"))

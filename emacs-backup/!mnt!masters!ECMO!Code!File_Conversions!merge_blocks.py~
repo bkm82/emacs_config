@@ -1,0 +1,36 @@
+# trace generated using paraview version 5.11.0
+#import paraview
+#paraview.compatibility.major = 5
+#paraview.compatibility.minor = 11
+
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+num = 1200
+# create a new 'CGNS Series Reader'
+a1200_shcgns = CGNSSeriesReader(registrationName=f'{num}_sh.cgns', FileNames=[f'Z:\\ECMO\\Data\\CFD-Solutions\\CGNS-File-Series\\{num}_sh.cgns'])
+a1200_shcgns.Bases = ['Base_Surface_Elements']
+a1200_shcgns.CellArrayStatus = []
+
+# get animation scene
+animationScene1 = GetAnimationScene()
+
+# update animation scene based on data timesteps
+animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+# Properties modified on a1200_shcgns
+a1200_shcgns.CellArrayStatus = ['Velocity']
+
+UpdatePipeline(time=12.0, proxy=a1200_shcgns)
+
+# create a new 'Merge Blocks'
+mergeBlocks1 = MergeBlocks(registrationName='MergeBlocks1', Input=a1200_shcgns)
+
+UpdatePipeline(time=12.0, proxy=mergeBlocks1)
+
+# save data
+SaveData(f'Z:/ECMO/Data/CFD-Solutions/VTU-File-Series/velocity_{num}.vtu', proxy=mergeBlocks1, CellDataArrays=['Velocity'],
+    FieldDataArrays=['ispatch'])
+
+ResetSession()

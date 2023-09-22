@@ -1,0 +1,7 @@
+import paraview.simple
+
+#load plugin
+LoadPlugin('\\wsl.localhost\Ubuntu\home\bkm82\masters\ECMO\Code\no-slip-paraview-filter\src\noslip\no-slip-filter', remote=False, ns=globals())
+
+# create a new 'XML Unstructured Grid Reader'
+patient_Meshvtu = XMLUnstructuredGridReader(registrationName='Velocity_1200.vtu', FileName=['\\wsl.localhost\Ubuntu\home\bkm82\masters\ECMO\Data\CFD-Solutions\VTU-File-Series\Velocity_1200.vtu'])

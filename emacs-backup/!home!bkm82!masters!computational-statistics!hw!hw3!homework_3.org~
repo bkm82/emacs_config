@@ -1,0 +1,128 @@
+#+TITLE: Homework 3
+#+AUTHOR: Bray Moll
+#+OPTIONS: toc:nil
+#+SETUPFILE: ~/masters/bray-standard-latex-export.org
+
+* Exercise 1
+** Given:
+a) The Auto dataset from the ISLR2 package \\
+** Find:
+a) use the lm() function to perform a simple linear regression with mpg as the
+response and horesepower as the predictor. Use the summary() function to print
+the results\\
+    Is there a relationship between the predictor and the response? \\
+    How strong is the relationship between the predictor and the response? \\
+    Is the relationship between the predictor and teh respones positive or
+negative
+
+b) What is the predicted mpg associated with a horsepower of 98? \\
+c) plot the response and the predictor. Use the abline() function to display the
+least squares regression line \\
+d) Use the plot() function to produce a diagnostic plots of the least squares
+regression fit. Comment on any problems you see with the fit \\
+\newpage
+** Solution:
+#+ATTR_LATEX: :options frame=single
+#+BEGIN_SRC R :results output :exports both :session R-session 
+  rm(list=ls())
+  setwd("~/masters/computational-statistics/hw")
+  library(ISLR2)
+  library(ggplot2)
+  library(dplyr)
+
+  data("Auto")
+  linear_model <- lm(mpg~horsepower, data = Auto)
+  summary(linear_model)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Call:
+lm(formula = mpg ~ horsepower, data = Auto)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-13.5710  -3.2592  -0.3435   2.7630  16.9240 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 39.935861   0.717499   55.66   <2e-16 ***
+horsepower  -0.157845   0.006446  -24.49   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.906 on 390 degrees of freedom
+Multiple R-squared:  0.6059,	Adjusted R-squared:  0.6049 
+F-statistic: 599.7 on 1 and 390 DF,  p-value: < 2.2e-16
+#+end_example
+
+
+Yes, there is a relationship between horsepower and mpg as shown by the adjusted
+R-squared value of 0.6049 showing that ~60% of the varaince can be explained by
+the model. The relationship between horesepower and mpg is negative as
+demonstrated by the horesepower coefficent of -0.157 which shows that for each
+unit increase in horsepower the mpg goes down by 0.1578 miles per gallon 
+
+#+ATTR_LATEX: :options frame=single
+#+BEGIN_SRC R :results value :exports both :session R-session 
+  new_data = data.frame (horsepower = 98)
+  predict(linear_model, new_data)
+#+END_SRC
+
+#+RESULTS:
+: 24.4670771525124
+
+The predicted mpg associated with a horsepower of 98 is 24.5
+
+#+ATTR_LATEX: :options frame=single
+#+BEGIN_SRC R :results graphics file :file hw3_1c.png :exports both :session R-session
+  myplot <- ggplot(Auto, aes(x= horsepower, y = mpg)) +
+    geom_point() +
+    labs(
+      x = "horsepower",
+      y = "balance",
+      ) +
+  geom_abline(
+    intercept = linear_model$coefficients[1],
+    slope = linear_model$coefficients[2])
+  plot_save <- ggsave(path = "hw3", filename="hw3_1c.png", plot = myplot)
+#+END_SRC
+
+#+RESULTS:
+[[file:hw3_1c.png]]
+
+#+ATTR_LATEX: :options frame=single
+#+BEGIN_SRC R :results graphics file :file diagnostic_plot_all.png :exports both :session R-session 
+  png("hw3/diagnostic_plot_all.png", width=6, height=6, units='in', res=300)
+  layout(matrix(1:4, ncol = 2))
+  plot(linear_model)
+  layout(1)
+  dev.off()
+#+END_SRC
+
+#+RESULTS:
+[[file:diagnostic_plot_all.png]]
+
+The residuals vs fitted show a non-linear relationship. This was obvious in the
+plotted results as well. Additionally the Scale-Location plot does not support
+the equal variance assumption implying that there may be some
+hederoscedasticity. However I would recomend reassessing this after a non-linear
+model is applied. The normal quantile plot does support that the
+residuals are normally distributed. There is a slight deviation in the ends but
+not to the degree that would significantly impact the analisis. The Residuals vs
+Leverage does not suggest that there are individual points that are leveraging
+the resutls. \\
+
+Overall, I would investigate a nonlinear fit (such as a logrithmic
+transformation) due to the Residuals vs Fitted Plot.

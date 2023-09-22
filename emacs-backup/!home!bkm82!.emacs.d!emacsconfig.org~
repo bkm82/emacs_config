@@ -1,0 +1,32 @@
+#+Title Emacs Configuration
+
+* Basic UI Configuration
+
+#+begin_src emacs-lisp :tangle ./init-new.el
+  ;; Inibit startup message
+  (setq inhibit-startup-message t) 
+
+  ;; Set the cursor to default to a bar
+  (setq-default cursor-type 'bar)
+
+  ;; Set the default font size
+  (defvar runemacs/default-font-size 180)
+
+  (menu-bar-mode -1) ; Turn off the menu bar
+  (tool-bar-mode -1) ; Turn off the tool bar
+  (tooltip-mode -1)  ; Diable tooltips
+  (set-fringe-mode 10) ; give some room around the board of the screen
+
+  (load-theme 'wombat) ; wombat 
+
+  ; show the line numbers
+  (global-display-line-numbers-mode 1)
+
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+#+end_src

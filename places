@@ -1,5 +1,11 @@
 ;;; -*- coding: utf-8; mode: lisp-data -*-
-(("/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org_archive" . 122)
+(("/home/bkm82/.emacs.d/init-new.el" . 1272)
+ ("/home/bkm82/.emacs.d/init.el" . 2258)
+ ("/home/bkm82/.emacs.d/Emacs.org" . 89)
+ ("/home/bkm82/.emacs.d/emacsconfig.org" . 1825)
+ ("/home/bkm82/.emacs.d/"
+  (dired-filename . "/home/bkm82/.emacs.d/init.el"))
+ ("/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org_archive" . 122)
  ("/mnt/c/Users/bkm82/Downloads/Chapter_4_script.R" . 707)
  ("/home/bkm82/masters/computational-statistics/hw/hw3/"
   (dired-filename . "/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org"))
@@ -7,7 +13,6 @@
  ("/home/bkm82/masters/computational-statistics/hw/hw2/homework_2_BM.org" . 10667)
  ("/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org" . 6834)
  ("/home/bkm82/masters/computational-statistics/lecture-notes/notes.org" . 11500)
- ("/home/bkm82/.emacs.d/init.el" . 7064)
  ("/home/bkm82/masters/computational-statistics/hw/hw1/"
   (dired-filename . "/home/bkm82/masters/computational-statistics/hw/hw1/homework_1.r"))
  ("/home/bkm82/masters/computational-statistics/hw/hw1/homework1.org" . 5361)
@@ -35,8 +40,6 @@
  ("/snap/emacs/current/usr/share/emacs/29.1/etc/TODO" . 3038)
  ("/home/bkm82/masters/computational-statistics/hw/hw2/homework_2_BM.pdf" . 723973)
  ("/home/bkm82/masters/bray-standard-latex-export.org" . 31)
- ("/home/bkm82/.emacs.d/"
-  (dired-filename . "/home/bkm82/.emacs.d/init.el"))
  ("/home/bkm82/masters/CFD/notes/latex_test1.org" . 753)
  ("/home/bkm82/masters/computational-statistics/lecture-notes/"
   (dired-filename . "/home/bkm82/masters/computational-statistics/lecture-notes/notes.org"))

@@ -1,7 +1,8 @@
 ;;; -*- coding: utf-8; mode: lisp-data -*-
-(("/home/bkm82/.emacs.d/init-new.el" . 1272)
+(("/home/bkm82/.emacs.d/init-backup.el" . 2198)
+ ("/home/bkm82/.emacs.d/Emacs.org" . 85)
+ ("/home/bkm82/.emacs.d/init-new.el" . 1272)
  ("/home/bkm82/.emacs.d/init.el" . 2258)
- ("/home/bkm82/.emacs.d/Emacs.org" . 89)
  ("/home/bkm82/.emacs.d/emacsconfig.org" . 1825)
  ("/home/bkm82/.emacs.d/"
   (dired-filename . "/home/bkm82/.emacs.d/init.el"))

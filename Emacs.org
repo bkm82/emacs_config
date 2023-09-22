@@ -1,3 +1,4 @@
+
 #+title: Emacs Configuration File 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
@@ -10,13 +11,13 @@ This is the configuration based on the "emacs from scratch" configuration
 
   ;; NOTE: init.el is now generated from Emacs.org.  Please edit that file
   ;;       in Emacs and init.el will be generated automatically!
-
+  ;; am i auto saving
   ;; You will most likely need to adjust this font size for your system!
-  (defvar efs/default-font-size 180)
-  (defvar efs/default-variable-font-size 180)
+  ;; (defvar efs/default-font-size 180)
+  ;;  (defvar efs/default-variable-font-size 180)
 
   ;; Make frame transparency overridable
-  (defvar efs/frame-transparency '(90 . 90))
+  ;;(defvar efs/frame-transparency '(90 . 90))
 
 #+end_src
 
@@ -125,10 +126,10 @@ This section configures basic UI settings that remove unneeded elements to make 
   (global-display-line-numbers-mode t)
 
   ;; Set frame transparency
-  (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
-  (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
-  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+;;  (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
+;;  (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
+;;  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+;;  (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
   ;; Disable line numbers for some modes
   (dolist (mode '(org-mode-hook
@@ -140,21 +141,6 @@ This section configures basic UI settings that remove unneeded elements to make 
 
 #+end_src
 
-** Font Configuration
-
-I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://fonts.google.com/specimen/Cantarell][Cantarell]] fonts for this configuration which will more than likely need to be installed on your machine.  Both can usually be found in the various Linux distro package managers or downloaded from the links above.
-
-#+begin_src emacs-lisp
-
-(set-face-attribute 'default nil :font "Fira Code Retina" :height efs/default-font-size)
-
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height efs/default-font-size)
-
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
-
-#+end_src
 
 * Keybinding Configuration
 
@@ -186,7 +172,7 @@ I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://f
 #+begin_src emacs-lisp
 
 (use-package doom-themes
-  :init (load-theme 'doom-palenight t))
+  :init (load-theme 'wombat))
 
 #+end_src
 
@@ -305,8 +291,8 @@ This is an example of using [[https://github.com/abo-abo/hydra][Hydra]] to desig
     ("k" text-scale-decrease "out")
     ("f" nil "finished" :exit t))
 
-  (efs/leader-keys
-    "ts" '(hydra-text-scale/body :which-key "scale text"))
+ ; (efs/leader-keys
+ ;   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 #+end_src
 
@@ -320,35 +306,35 @@ The =efs/org-font-setup= function configures various text faces to tweak the siz
 
 #+begin_src emacs-lisp
 
-  (defun efs/org-font-setup ()
+  ;(defun efs/org-font-setup ()
     ;; Replace list hyphen with dot
-    (font-lock-add-keywords 'org-mode
-                            '(("^ *\\([-]\\) "
-                               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+   ; (font-lock-add-keywords 'org-mode
+   ;                         '(("^ *\\([-]\\) "
+   ;                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
     ;; Set faces for heading levels
-    (dolist (face '((org-level-1 . 1.2)
-                    (org-level-2 . 1.1)
-                    (org-level-3 . 1.05)
-                    (org-level-4 . 1.0)
-                    (org-level-5 . 1.1)
-                    (org-level-6 . 1.1)
-                    (org-level-7 . 1.1)
-                    (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
+    ;(dolist (face '((org-level-1 . 1.2)
+    ;                (org-level-2 . 1.1)
+    ;                (org-level-3 . 1.05)
+    ;                (org-level-4 . 1.0)
+    ;                (org-level-5 . 1.1)
+    ;                (org-level-6 . 1.1)
+    ;                (org-level-7 . 1.1)
+    ;                (org-level-8 . 1.1)))
+    ;  (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
 
     ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-    (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+   ; (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+   ; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+   ; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+   ; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+   ; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+   ; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+   ; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+   ; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+   ; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+   ; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+   ; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
 #+end_src
 

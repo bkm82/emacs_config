@@ -338,36 +338,36 @@ The =efs/org-font-setup= function configures various text faces to tweak the siz
 
 #+end_src
 
-** Basic Config
+** COMMENT Basic Config
 
 This section contains the basic configuration for =org-mode= plus the configuration for Org agendas and capture templates.  There's a lot to unpack in here so I'd recommend watching the videos for [[https://youtu.be/VcgjTEa0kU4][Part 5]] and [[https://youtu.be/PNE-mgkZ6HM][Part 6]] for a full explanation.
 
 #+begin_src emacs-lisp
 
-  (defun efs/org-mode-setup ()
-    (org-indent-mode)
-    (variable-pitch-mode 1)
-    (visual-line-mode 1))
+  ;(defun efs/org-mode-setup ()
+  ;  (org-indent-mode)
+  ;  (variable-pitch-mode 1)
+  ;  (visual-line-mode 1))
 
-  (use-package org
-    :pin org
-    :commands (org-capture org-agenda)
-    :hook (org-mode . efs/org-mode-setup)
-    :config
-    (setq org-ellipsis " ▾")
+ ; (use-package org
+ ;   :pin org
+ ;   :commands (org-capture org-agenda)
+ ;   :hook (org-mode . efs/org-mode-setup)
+ ;   :config
+ ;   (setq org-ellipsis " ▾")
 
-    (setq org-agenda-start-with-log-mode t)
-    (setq org-log-done 'time)
-    (setq org-log-into-drawer t)
+;    (setq org-agenda-start-with-log-mode t)
+;    (setq org-log-done 'time)
+;    (setq org-log-into-drawer t)
 
     ;;(setq org-agenda-files
     ;;      '("~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org"
     ;;        "~/Projects/Code/emacs-from-scratch/OrgFiles/Habits.org"
     ;;       "~/Projects/Code/emacs-from-scratch/OrgFiles/Birthdays.org"))
 
-    (require 'org-habit)
-    (add-to-list 'org-modules 'org-habit)
-    (setq org-habit-graph-column 60)
+;    (require 'org-habit)
+;    (add-to-list 'org-modules 'org-habit)
+;    (setq org-habit-graph-column 60)
 
     (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
@@ -471,7 +471,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (define-key global-map (kbd "C-c j")
       (lambda () (interactive) (org-capture nil "jj")))
 
-    (efs/org-font-setup))
+    )
 
 #+end_src
 
@@ -526,7 +526,7 @@ To execute or export code in =org-mode= code blocks, you'll need to set up =org-
        (sqlite . t))))
 
 
-    (push '("conf-unix" . conf-unix) org-src-lang-modes))
+   ; (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
 #+end_src
 
@@ -576,7 +576,7 @@ You can add more =src= block templates below by copying one of the lines and cha
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+ ; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
   (use-package pdf-tools
      :defer t
@@ -635,7 +635,7 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
 
 
 
-* Development
+* COMMENT Development
 
 ** Languages
 
@@ -893,7 +893,7 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 
 #+end_src
 
-* Terminals
+* COMMENT Terminals
 
 ** term-mode
 
@@ -1028,7 +1028,7 @@ For more thoughts on Eshell, check out these articles by Pierre Neidhardt:
 
 #+end_src
 
-* File Management
+* COMMENT File Management
 
 ** Dired
 
@@ -1128,7 +1128,7 @@ Dired is a built-in file manager for Emacs that does some pretty amazing things!
 
 #+end_src
 
-* Applications
+* COMMENT Applications
 
 ** Some App
 
@@ -1149,7 +1149,7 @@ This is an example of configuring another non-Emacs application using org-mode. 
 
 #+end_src
 
-* Runtime Performance
+* COMMENT Runtime Performance
 
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 
@@ -1160,6 +1160,6 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 
 #+end_src
 
-* Notes
+* COMMENT Notes
 ** TODO Check the backup directory
 

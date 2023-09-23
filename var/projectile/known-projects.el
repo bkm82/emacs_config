@@ -1,1 +1,0 @@
-("~/.emacs.d/" "~/masters/computational-statistics/hw/" "~/masters/ECMO/Code/no-slip-paraview-filter/" "~/masters/ECMO/Code/file-conversions/" "~/masters/CFD/")

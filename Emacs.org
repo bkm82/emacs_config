@@ -5,7 +5,7 @@
 * Welcome!
 
 This is the configuration based on the "emacs from scratch" configuration 
-
+make a test for thsi
 
 #+begin_src emacs-lisp
   ;; NOTE: init.el is now generated from Emacs.org.  Please edit that file

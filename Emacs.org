@@ -1,7 +1,4 @@
 
-
-
-
 #+title: Emacs Configuration File 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
@@ -22,9 +19,7 @@ This is the configuration based on the "emacs from scratch" configuration
 #+end_src
 
 
-
-
-* * Startup Performance
+* Startup Performance
 
 #+begin_src emacs-lisp
 
@@ -661,9 +656,8 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
 
 
 
-* COMMENT Development
-
-** Languages
+* Development
+** COMMENT Languages
 
 *** IDE Features with lsp-mode
 
@@ -830,7 +824,7 @@ You can use the pyvenv package to use =virtualenv= environments in Emacs.  The =
 
 #+end_src
 
-** Company Mode
+** COMMENT Company Mode
 
 [[http://company-mode.github.io/][Company Mode]] provides a nicer in-buffer completion interface than =completion-at-point= which is more reminiscent of what you would expect from an IDE.  We add a simple configuration to make the keybindings a little more useful (=TAB= now completes the selection and initiates completion at the current location if needed).
 
@@ -868,17 +862,18 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     ("C-c p" . projectile-command-map)
     :init
     ;; NOTE: Set this to the folder where you keep your Git repos!
-    (when (file-directory-p "~/Projects/Code")
-      (setq projectile-project-search-path '("~/Projects/Code")))
+    (when (file-directory-p "~/masters")
+      (setq projectile-project-search-path '(("~/masters" . 3 ))))
     (setq projectile-switch-project-action #'projectile-dired))
 
-  (use-package counsel-projectile
-    :after projectile
-    :config (counsel-projectile-mode))
+ ; (use-package counsel-projectile
+ ;   :after projectile
+ ;   :config (counsel-projectile-mode))
 
 #+end_src
 
 ** Magit
+
 
 [[https://magit.vc/][Magit]] is the best Git interface I've ever used.  Common Git operations are easy to execute quickly using Magit's command panel system.
 
@@ -892,12 +887,12 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
   ;; NOTE: Make sure to configure a GitHub token before using this package!
   ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
   ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
-  (use-package forge
-    :after magit)
+ ;; (use-package forge
+ ;;   :after magit)
 
 #+end_src
 
-** Commenting
+** COMMENT Commenting
 
 Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=) doesn't always comment things in the way you might expect so we use [[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commenter]] to provide a more familiar behavior.  I've bound it to =M-/= since other editors sometimes use this binding but you could also replace Emacs' =M-;= binding with this command.
 

@@ -1,15 +1,21 @@
 ((:container
   ((elisp org-element--headline-cache)
    (elisp org-element--cache))
+  :persist-file "96/81d230-78ab-4769-912c-7ac04f66941f" :associated
+  (:hash "b73e37b95e8c238e7ca212973eb7c784" :file "/home/bkm82/masters/computational-statistics/hw/hw1/homework1.org" :inode 18369)
+  :expiry 30 :last-access 1695442011.4978638 :last-access-hr "2023-09-22T21:06:51-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
   :persist-file "c4/101fe9-9437-4056-9198-4ad215cfefb7" :associated
-  (:hash "83d7b73f4400e2a578ccb5b6dcb73a72" :file "/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org" :inode 167297)
-  :expiry 30 :last-access 1695427124.8660667 :last-access-hr "2023-09-22T16:58:44-0700")
+  (:hash "83d7b73f4400e2a578ccb5b6dcb73a72" :file "/home/bkm82/masters/computational-statistics/hw/hw3/homework_3.org" :inode 25962)
+  :expiry 30 :last-access 1695441441.7652276 :last-access-hr "2023-09-22T20:57:21-0700")
  (:container
   ((elisp org-element--headline-cache)
    (elisp org-element--cache))
   :persist-file "1b/f9d456-cc7c-42f3-9897-ea40fd7139fa" :associated
-  (:hash "ffc0c1afc31293707aeb498bfa897ec8" :file "/home/bkm82/.emacs.d/Emacs.org" :inode 167916)
-  :expiry 30 :last-access 1695427124.879077 :last-access-hr "2023-09-22T16:58:44-0700")
+  (:hash "6c0867770eb5ca9d10ec47950a4da0bc" :file "/home/bkm82/.emacs.d/Emacs.org" :inode 167916)
+  :expiry 30 :last-access 1695442622.5309992 :last-access-hr "2023-09-22T21:17:02-0700")
  (:container
   ((index "3.1"))
-  :persist-file "43/800c0b-16d8-4321-a9d7-aaac4fa1ecad" :associated nil :expiry never :last-access 1695427124.8952491 :last-access-hr "2023-09-22T16:58:44-0700"))
+  :persist-file "43/800c0b-16d8-4321-a9d7-aaac4fa1ecad" :associated nil :expiry never :last-access 1695442622.542657 :last-access-hr "2023-09-22T21:17:02-0700"))

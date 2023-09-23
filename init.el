@@ -447,6 +447,18 @@
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 ;new comment
 
+(setq ess-r-backend 'lsp)
+(add-hook 'ess-r-mode-hook (lambda () (lsp)))
+
+
+
+(with-eval-after-load 'lsp-mode
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("R" "--slave" "-e" "languageserver::run()"))
+    :major-modes '(ess-mode inferior-ess-r-mode)
+    :server-id 'lsp-R)))
+
 (use-package company
   :after lsp-mode
   :hook (lsp-mode . company-mode)

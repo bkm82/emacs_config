@@ -1,4 +1,4 @@
-ema;Inibit startup message
+eema;Inibit startup message
 (setq inhibit-startup-message t) 
 
 ;ensure cursor default is a bar

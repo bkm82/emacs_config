@@ -657,7 +657,7 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
 
 * Development
 ** Languages
-*** COMMENT IDE Features with lsp-mode
+*** IDE Features with lsp-mode
 **** lsp-mode
 
 We use the excellent [[https://emacs-lsp.github.io/lsp-mode/][lsp-mode]] to enable IDE-like functionality for many different programming languages via "language servers" that speak the [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]].  Before trying to set up =lsp-mode= for a particular language, check out the [[https://emacs-lsp.github.io/lsp-mode/page/languages/][documentation for your language]] so that you can learn which language servers are available and how to install them.

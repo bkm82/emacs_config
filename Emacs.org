@@ -826,7 +826,7 @@ You can use the pyvenv package to use =virtualenv= environments in Emacs.  The =
 #+end_src
 
 *** R
-This is an attempt to get an 
+This is setting up to run lsp mode for R. 
 
 #+begin_src emacs-lisp
   (setq ess-r-backend 'lsp)

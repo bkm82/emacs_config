@@ -529,6 +529,7 @@ To execute or export code in =org-mode= code blocks, you'll need to set up =org-
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((R . t)
+       (python .t)
        (org . t)
        (ditaa . t)
        (latex . t)
@@ -649,12 +650,6 @@ This snippet adds a hook to =org-mode= buffers so that =efs/org-babel-tangle-con
   ;new comment
 #+end_src
 
-
-
-
-
-
-
 * Development
 ** Languages
 *** IDE Features with lsp-mode
@@ -730,7 +725,7 @@ Try these commands with =M-x=:
 
 #+end_src
 
-*** COMMENT Debugging with dap-mode
+*** Debugging with dap-mode
 
 [[https://emacs-lsp.github.io/dap-mode/][dap-mode]] is an excellent package for bringing rich debugging capabilities to Emacs via the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adapter Protocol]].  You should check out the [[https://emacs-lsp.github.io/dap-mode/page/configuration/][configuration docs]] to learn how to configure the debugger for your language.  Also make sure to check out the documentation for the debug adapter to see what configuration parameters are available to use for your debug templates!
 
@@ -780,7 +775,7 @@ npm install -g typescript-language-server typescript
 
 This will install the [[https://github.com/theia-ide/typescript-language-server][typescript-language-server]] and the TypeScript compiler package.
 
-*** COMMENT Python
+*** Python
 
 We use =lsp-mode= and =dap-mode= to provide a more complete development environment for Python in Emacs.  Check out [[https://emacs-lsp.github.io/lsp-mode/page/lsp-pyls/][the =pyls= configuration]] in the =lsp-mode= documentation for more details.
 
@@ -803,8 +798,8 @@ There are a number of other language servers for Python so if you find that =pyl
     :hook (python-mode . lsp-deferred)
     :custom
     ;; NOTE: Set these if Python 3 is called "python3" on your system!
-    ;; (python-shell-interpreter "python3")
-    ;; (dap-python-executable "python3")
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
     (dap-python-debugger 'debugpy)
     :config
     (require 'dap-python))
@@ -830,8 +825,12 @@ This is setting up to run lsp mode for R.
 
 #+begin_src emacs-lisp
   (setq ess-r-backend 'lsp)
-  (add-hook 'ess-r-mode-hook (lambda () (lsp)))
+  ;;(add-hook 'ess-r-mode-hook (lambda () (lsp)))
 
+  (use-package ess-r-mode
+      :ensure nil
+      :hook (ess-r-mode . lsp-deferred))
+     
 
 
   (with-eval-after-load 'lsp-mode
@@ -843,7 +842,7 @@ This is setting up to run lsp mode for R.
 
 #+end_src
 
-#+RESULTS:
+
 
 ** Company Mode
 

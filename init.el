@@ -4,7 +4,7 @@
   (defvar efs/default-variable-font-size 150)
 
 ;; Make frame transparency overridable
-(defvar efs/frame-transparency '(10 . 10))
+;;(defvar efs/frame-transparency '(10 . 10))
 
 ;; e default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
@@ -72,8 +72,8 @@
 (global-display-line-numbers-mode t)
 
   ;; Set frame transparency
-(set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
-(add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
+;;(set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
+;;(add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -177,6 +177,30 @@
 
 ; (efs/leader-keys
 ;   "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+(set-frame-parameter nil 'alpha-background 100)
+
+
+(defvar previous-alpha-background 90)
+
+(defun toggle-window-transparency ()
+  "Toggle transparency between 100% and the previous level."
+  (interactive)
+  (if (eq (frame-parameter nil 'alpha-background) 100)
+      (set-frame-parameter nil 'alpha-background previous-alpha-background)
+    (progn
+      (setq previous-alpha-background (frame-parameter nil 'alpha-background))
+      (set-frame-parameter nil 'alpha-background 100))))
+
+;; (defun toggle-window-transparency ()
+;;   "Toggle transparency."
+;;   (interactive)
+;;   (let ((alpha-transparency 100))
+;;     (pcase (frame-parameter nil 'alpha-background)
+;;       (alpha-transparency (set-frame-parameter nil 'alpha-background 100))
+;;       (t (set-frame-parameter nil 'alpha-background alpha-transparency)))))
+
+(global-set-key (kbd "C-c t") 'toggle-window-transparency)
 
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
@@ -383,6 +407,16 @@
                      '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC R :results graphics file :file FILENAME :exports both :session R-session \n    " r "\n#+END_SRC" >)
                       "<rp"
                       "Insert an r code block with prefences")
+
+  (tempo-define-template "python-block-with-latex"
+                         '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC python :results output :exports both :session Python-Session \n    " r "\n#+END_SRC" >)
+                         "<p"
+                         "Insert an python code block with prefences")
+  (tempo-define-template "python-plot-block-with-latex"
+                         '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC python :results graphics file :file FILENAME :exports both :session Python-Session \n    " r "\n#+END_SRC" >)
+                         "<pp"
+                         "Insert an python code block with prefences")
+
   )
 
 ;; Setup a plain Latex class as shown https://www.reddit.com/r/orgmode/comments/lzsygs/perfect_org_mode_exports_to_latex_easy_extensible/
@@ -452,13 +486,34 @@
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
+;; (use-package lsp-mode
+;;   :commands (lsp lsp-deferred)
+;;   :hook (lsp-mode . efs/lsp-mode-setup)
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+;;   :config
+;;   (lsp-enable-which-key-integration t)
+;;   (lsp-register-custom-settings
+;;    '(("pyls.plugins.pyls_black.enabled" t)
+
+;;      ("pyls.plugin.flake8.enabled" t )
+;;      ("pyls.plugins.flake8.maxLineLenght" 88)))
+;;   )
+
 (use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :hook (lsp-mode . efs/lsp-mode-setup)
-  :init
-  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-  :config
-  (lsp-enable-which-key-integration t))
+:commands (lsp lsp-deferred)
+:hook (lsp-mode . efs/lsp-mode-setup)
+:init
+(setq lsp-keymap-prefix "C-c l") ; Or 'C-l', 's-l'
+:config
+(lsp-enable-which-key-integration t)
+(lsp-register-custom-settings
+ '(("pyls.plugins.pycodestyle.enabled" nil)   ; Disable pycodestyle
+   ("pyls.plugins.pyflakes.enabled" nil)     ; Disable pyflakes
+   ("pyls.plugins.mccabe.enabled" nil)       ; Disable mccabe
+   ("pyls.plugins.flake8.enabled" t)         ; Enable Flake8
+   ("pyls.plugins.flake8.maxLineLength" 88))) ; Set max line length for Flake8
+)
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
@@ -471,34 +526,12 @@
 (use-package lsp-ivy
   :after lsp)
 
-(use-package dap-mode
-  ;; Uncomment the config below if you want all UI panes to be hidden by default!
-  ;; :custom
-  ;; (lsp-enable-dap-auto-configure nil)
-  ;; :config
-  ;; (dap-ui-mode 1)
-  :commands dap-debug
-  :config
-  ;; Set up Node debugging
-  (require 'dap-node)
-  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
-
-  ;; Bind `C-c l d` to `dap-hydra` for easy access
-  (general-define-key
-    :keymaps 'lsp-mode-map
-    :prefix lsp-keymap-prefix
-    "d" '(dap-hydra t :wk "debugger")))
-
 (use-package python-mode
   :ensure t
   :hook (python-mode . lsp-deferred)
   :custom
   ;; NOTE: Set these if Python 3 is called "python3" on your system!
-  (python-shell-interpreter "python3")
-  (dap-python-executable "python3")
-  (dap-python-debugger 'debugpy)
-  :config
-  (require 'dap-python))
+  (python-shell-interpreter "python3"))
 
 (use-package pyvenv
   :after python-mode
@@ -567,3 +600,59 @@
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package term
+  :commands term
+  :config
+  (setq explicit-shell-file-name "bash") ;; Change this to zsh, etc
+  ;;(setq explicit-zsh-args '())         ;; Use 'explicit-<shell>-args for shell-specific args
+
+  ;; Match the default Bash shell prompt.  Update this if you have a custom prompt
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
+
+(use-package eterm-256color
+  :hook (term-mode . eterm-256color-mode))
+
+(use-package vterm
+  :commands vterm
+  :config
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  ;; Set this to match your custom shell prompt
+  ;;(setq vterm-shell "zsh")                       ;; Set this to customize the shell to launch
+  (setq vterm-max-scrollback 10000))
+
+(when (eq system-type 'windows-nt)
+  (setq explicit-shell-file-name "powershell.exe")
+  (setq explicit-powershell.exe-args '()))
+
+(defun efs/configure-eshell ()
+  ;; Save command history when commands are entered
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+  ;; Truncate buffer for performance
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+  ;; Bind some useful keys for evil-mode
+  ;;(evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+  ;;(evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+  ;;(evil-normalize-keymaps)
+
+  (setq eshell-history-size         10000
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t))
+
+(use-package eshell-git-prompt
+  :after eshell)
+
+(use-package eshell
+  :hook (eshell-first-time-mode . efs/configure-eshell)
+  :config
+
+  (with-eval-after-load 'esh-opt
+    (setq eshell-destroy-buffer-when-process-dies t)
+    (setq eshell-visual-commands '("htop" "zsh" "vim")))
+
+  (eshell-git-prompt-use-theme 'powerline))
+
+;; Make gc pauses faster by decreasing the threshold.
+(setq gc-cons-threshold (* 2 1000 1000))

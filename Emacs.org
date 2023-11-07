@@ -1,4 +1,5 @@
 
+
 #+title: Emacs Configuration File 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
@@ -14,7 +15,7 @@ make a test for thsi
     (defvar efs/default-variable-font-size 150)
 
   ;; Make frame transparency overridable
-  (defvar efs/frame-transparency '(10 . 10))
+  ;;(defvar efs/frame-transparency '(10 . 10))
 
 #+end_src
 
@@ -123,8 +124,8 @@ This section configures basic UI settings that remove unneeded elements to make 
     (global-display-line-numbers-mode t)
 
       ;; Set frame transparency
-    (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
-    (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
+    ;;(set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
+    ;;(add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
     (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
     (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -310,6 +311,36 @@ This is an example of using [[https://github.com/abo-abo/hydra][Hydra]] to desig
  ;   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 #+end_src
+
+** Transparent Background
+#+begin_src emacs-lisp
+  (set-frame-parameter nil 'alpha-background 100)
+
+
+  (defvar previous-alpha-background 90)
+
+  (defun toggle-window-transparency ()
+    "Toggle transparency between 100% and the previous level."
+    (interactive)
+    (if (eq (frame-parameter nil 'alpha-background) 100)
+        (set-frame-parameter nil 'alpha-background previous-alpha-background)
+      (progn
+        (setq previous-alpha-background (frame-parameter nil 'alpha-background))
+        (set-frame-parameter nil 'alpha-background 100))))
+
+  ;; (defun toggle-window-transparency ()
+  ;;   "Toggle transparency."
+  ;;   (interactive)
+  ;;   (let ((alpha-transparency 100))
+  ;;     (pcase (frame-parameter nil 'alpha-background)
+  ;;       (alpha-transparency (set-frame-parameter nil 'alpha-background 100))
+  ;;       (t (set-frame-parameter nil 'alpha-background alpha-transparency)))))
+
+  (global-set-key (kbd "C-c t") 'toggle-window-transparency)
+#+end_src
+
+#+RESULTS:
+: toggle-window-transparency
 
 * Org Mode
 
@@ -568,6 +599,16 @@ You can add more =src= block templates below by copying one of the lines and cha
                        '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC R :results graphics file :file FILENAME :exports both :session R-session \n    " r "\n#+END_SRC" >)
                         "<rp"
                         "Insert an r code block with prefences")
+
+    (tempo-define-template "python-block-with-latex"
+                           '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC python :results output :exports both :session Python-Session \n    " r "\n#+END_SRC" >)
+                           "<p"
+                           "Insert an python code block with prefences")
+    (tempo-define-template "python-plot-block-with-latex"
+                           '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC python :results graphics file :file FILENAME :exports both :session Python-Session \n    " r "\n#+END_SRC" >)
+                           "<pp"
+                           "Insert an python code block with prefences")
+
     )
 
 #+end_src
@@ -667,13 +708,34 @@ The =which-key= integration adds helpful descriptions of the various keys so you
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
 
+  ;; (use-package lsp-mode
+  ;;   :commands (lsp lsp-deferred)
+  ;;   :hook (lsp-mode . efs/lsp-mode-setup)
+  ;;   :init
+  ;;   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  ;;   :config
+  ;;   (lsp-enable-which-key-integration t)
+  ;;   (lsp-register-custom-settings
+  ;;    '(("pyls.plugins.pyls_black.enabled" t)
+
+  ;;      ("pyls.plugin.flake8.enabled" t )
+  ;;      ("pyls.plugins.flake8.maxLineLenght" 88)))
+  ;;   )
+
   (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook (lsp-mode . efs/lsp-mode-setup)
-    :init
-    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-    :config
-    (lsp-enable-which-key-integration t))
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . efs/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l") ; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t)
+  (lsp-register-custom-settings
+   '(("pyls.plugins.pycodestyle.enabled" nil)   ; Disable pycodestyle
+     ("pyls.plugins.pyflakes.enabled" nil)     ; Disable pyflakes
+     ("pyls.plugins.mccabe.enabled" nil)       ; Disable mccabe
+     ("pyls.plugins.flake8.enabled" t)         ; Enable Flake8
+     ("pyls.plugins.flake8.maxLineLength" 88))) ; Set max line length for Flake8
+  )
 
 #+end_src
 
@@ -725,7 +787,7 @@ Try these commands with =M-x=:
 
 #+end_src
 
-*** Debugging with dap-mode
+*** COMMENT Debugging with dap-mode
 
 [[https://emacs-lsp.github.io/dap-mode/][dap-mode]] is an excellent package for bringing rich debugging capabilities to Emacs via the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adapter Protocol]].  You should check out the [[https://emacs-lsp.github.io/dap-mode/page/configuration/][configuration docs]] to learn how to configure the debugger for your language.  Also make sure to check out the documentation for the debug adapter to see what configuration parameters are available to use for your debug templates!
 
@@ -798,14 +860,14 @@ There are a number of other language servers for Python so if you find that =pyl
     :hook (python-mode . lsp-deferred)
     :custom
     ;; NOTE: Set these if Python 3 is called "python3" on your system!
-    (python-shell-interpreter "python3")
-    (dap-python-executable "python3")
-    (dap-python-debugger 'debugpy)
-    :config
-    (require 'dap-python))
+    (python-shell-interpreter "python3"))
+
 
 
 #+end_src
+
+#+RESULTS:
+| lsp-deferred | doom-modeline-env-setup-python |
 
 
 
@@ -841,8 +903,6 @@ This is setting up to run lsp mode for R.
       :server-id 'lsp-R)))
 
 #+end_src
-
-
 
 ** Company Mode
 
@@ -934,7 +994,7 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 
 #+end_src
 
-* COMMENT Terminals
+* Terminals
 
 ** term-mode
 
@@ -1190,7 +1250,7 @@ This is an example of configuring another non-Emacs application using org-mode. 
 
 #+end_src
 
-* COMMENT Runtime Performance
+* Runtime Performance
 
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 

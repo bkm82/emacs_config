@@ -656,3 +656,14 @@
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
+
+;; Make gc pauses faster by decreasing the threshold.
+(use-package citeproc)
+
+(require `ox-md)
+
+(use-package ox-reveal)
+(require 'ox-reveal)
+
+(setq Org-Reveal-root "~/slides/reveal.js/js/reveal.js")
+(setq Org-Reveal-title-slide nil)

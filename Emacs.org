@@ -1,5 +1,6 @@
 
 
+
 #+title: Emacs Configuration File 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
@@ -1264,3 +1265,43 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 * COMMENT Notes
 ** TODO Check the backup directory
 
+* Citation Export
+#+begin_src emacs-lisp
+
+  ;; Make gc pauses faster by decreasing the threshold.
+  (use-package citeproc)
+
+#+end_src
+
+#+RESULTS:
+
+* Markdown Export
+
+
+
+#+begin_src emacs-lisp
+  (require `ox-md)
+#+end_src
+
+#+RESULTS:
+: ox-md
+
+* Reveal
+#+begin_src emacs-lisp
+  (use-package ox-reveal)
+  (require 'ox-reveal)
+  
+  (setq Org-Reveal-root "~/slides/reveal.js/js/reveal.js")
+  (setq Org-Reveal-title-slide nil)
+#+end_src
+
+#+RESULTS:
+
+* COMMENT Autotangle Package
+
+#+begin_src emacs-lisp
+  (use-package org-auto-tangle
+    :load-path "site-lisp/org-auto-tangle/"
+    :defer t
+    :hook (org-mode . org-auto-tangle-mode))
+#+end_src

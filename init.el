@@ -49,12 +49,28 @@
 ;; reliably, set `user-emacs-directory` before loading no-littering!
 ;;(setq user-emacs-directory "~/.emacs.d")
 
-(use-package no-littering)
+(use-package no-littering
+  :ensure t
+  :init
+  (setq auto-save-file-name-transforms
+        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+  :config
+  (no-littering-theme-backups))
 
 ;; no-littering doesn't set this by default so we must place
 ;; auto save files in the same path as it uses for sessions
-(setq auto-save-file-name-transforms
-      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+;;(setq auto-save-file-name-transforms
+;;      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+
+;; Set backups to go to the temporary file directory
+;;(setq backup-directory-alist
+;;      `((".*" . ,temporary-file-directory)))
+;;(setq auto-save-file-name-transforms
+;;      `((".*" ,temporary-file-directory t)))
+
+;; Auto delete backups older than a week
 
 (setq inhibit-startup-message t)
 
@@ -81,7 +97,6 @@
   (dolist (mode '(org-mode-hook
                   term-mode-hook
                   shell-mode-hook
-                  treemacs-mode-hook
                   eshell-mode-hook
                   doc-view-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
@@ -107,6 +122,8 @@
 
 
 (global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
+
+(global-unset-key (kbd "C-z"))
 
 (use-package doom-themes
   :init (load-theme 'wombat))
@@ -431,7 +448,20 @@
                   ("\\subsection{%s}" . "\\subsection*{%s}")
                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+   )
+
+;; Define an ieeetran-class varaible
+(setq ieeetran-class
+    '("IEEEtran" "\\documentclass[11pt]{IEEEtran}"
+      ("\\section{%s}" . "\\section*{%s}")
+      ("\\subsection{%s}" . "\\subsection*{%s}")
+      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+      ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;; Add it to the org-latex-classes
+(with-eval-after-load 'ox-latex (add-to-list 'org-latex-classes ieeetran-class t))
 
 ; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
@@ -486,19 +516,6 @@
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
-;; (use-package lsp-mode
-;;   :commands (lsp lsp-deferred)
-;;   :hook (lsp-mode . efs/lsp-mode-setup)
-;;   :init
-;;   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-;;   :config
-;;   (lsp-enable-which-key-integration t)
-;;   (lsp-register-custom-settings
-;;    '(("pyls.plugins.pyls_black.enabled" t)
-
-;;      ("pyls.plugin.flake8.enabled" t )
-;;      ("pyls.plugins.flake8.maxLineLenght" 88)))
-;;   )
 
 (use-package lsp-mode
 :commands (lsp lsp-deferred)
@@ -512,7 +529,7 @@
    ("pyls.plugins.pyflakes.enabled" nil)     ; Disable pyflakes
    ("pyls.plugins.mccabe.enabled" nil)       ; Disable mccabe
    ("pyls.plugins.flake8.enabled" t)         ; Enable Flake8
-   ("pyls.plugins.flake8.maxLineLength" 88))) ; Set max line length for Flake8
+   ("pyls.plugins.flake8.maxLineLength" 79))) ; Set max line length for Flake8
 )
 
 (use-package lsp-ui
@@ -520,11 +537,43 @@
   :custom
   (lsp-ui-doc-position 'bottom))
 
-(use-package lsp-treemacs
-  :after lsp)
-
 (use-package lsp-ivy
   :after lsp)
+
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
+  :commands dap-debug
+  :config
+  ;; Set up Node debugging
+  (require 'dap-node)
+  (require 'dap-chrome)
+  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+  (require 'dap-python)
+
+  (setq dap-python-debugger 'debugpy)
+  )
+
+  ;; Bind `C-c l d` to `dap-hydra` for easy access
+  ;; (general-define-key
+  ;;   :keymaps 'lsp-mode-map
+  ;;   :prefix lsp-keymap-prefix
+  ;;   "d" '(dap-hydra t :wk "debugger")))
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+
+(use-package js2-mode
+  :mode "\\.js\\'"
+  :hook (js2-mode . lsp-deferred)
+  :config
+  (setq js-indent-level 2))
 
 (use-package python-mode
   :ensure t
@@ -533,10 +582,30 @@
   ;; NOTE: Set these if Python 3 is called "python3" on your system!
   (python-shell-interpreter "python3"))
 
+;; (use-package pyvenv
+  ;;   :after python-mode
+  ;;   :config
+  ;;   (pyvenv-mode 1))
+
+
+(use-package virtualenvwrapper)
+(venv-initialize-interactive-shells) ;; if you want interactive shell support
+(venv-initialize-eshell) ;; if you want eshell support
+;; note that setting `venv-location` is not necessary if you
+;; use the default location (`~/.virtualenvs`), or if the
+;; the environment variable `WORKON_HOME` points to the right place
+(setq venv-location "~/.virtualenvs")
+
 (use-package pyvenv
   :after python-mode
   :config
   (pyvenv-mode 1))
+
+;; with use-package
+(use-package numpydoc
+  :ensure t
+  :bind (:map python-mode-map
+              ("C-c C-n" . numpydoc-generate)))
 
 (setq ess-r-backend 'lsp)
 ;;(add-hook 'ess-r-mode-hook (lambda () (lsp)))
@@ -544,8 +613,6 @@
 (use-package ess-r-mode
     :ensure nil
     :hook (ess-r-mode . lsp-deferred))
-
-
 
 (with-eval-after-load 'lsp-mode
   (lsp-register-client
@@ -569,16 +636,35 @@
   :hook (company-mode . company-box-mode))
 
 (use-package projectile
-   :diminish projectile-mode
-   :config (projectile-mode)
-   :custom ((projectile-completion-system 'ivy))
-   :bind-keymap
-   ("C-c p" . projectile-command-map)
-   :init
-   ;; NOTE: Set this to the folder where you keep your Git repos!
-   (when (file-directory-p "~/masters")
-     (setq projectile-project-search-path '(("~/masters" . 3 ))))
-   (setq projectile-switch-project-action #'projectile-dired))
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+  (when (file-directory-p "~/masters")
+    (setq projectile-project-search-path '(("~/masters" . 3 ))))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+
+(with-eval-after-load 'projectile
+  ;; Override Python Pip project test command
+  (projectile-update-project-type
+   'python-pip :test "pytest")
+
+  ;; Override Python Setup (pkg) project test command
+  (projectile-update-project-type
+   'python-pkg :test "pytest")
+
+  ;; Override Python Pipenv project test command
+  (projectile-update-project-type
+   'python-pipenv :test "pipenv run pytest")
+
+  ;; Override Generic Python project test command
+  (projectile-update-project-type
+   'python-toml :test "pytest")
+  )
 
 ; (use-package counsel-projectile
 ;   :after projectile
@@ -654,6 +740,19 @@
 
   (eshell-git-prompt-use-theme 'powerline))
 
+(defun rshell (&optional host)
+  "Open a remote shell to a host."
+  (interactive)
+  (with-temp-buffer
+    (let ((host (or host (read-string "Host: "))))
+      (cd (concat "/scp:" host ":"))
+      (shell (concat "*" host "*")))))
+
+
+(defun rshell-ubuntuResearch18 () (interactive) (rshell "bkm82@192.168.0.37"))
+(defun rshell-ubuntuResearch () (interactive) (rshell "bkm82@192.168.0.26"))
+(defun rshell-nodeone () (interactive) (rshell "bkm82@nodeone.braymoll.com"))
+
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
 
@@ -667,3 +766,23 @@
 
 (setq Org-Reveal-root "~/slides/reveal.js/js/reveal.js")
 (setq Org-Reveal-title-slide nil)
+
+(use-package ssh-agency)
+
+(use-package yasnippet
+  :config
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+  (yas-global-mode 1)
+  )
+
+(exec-path-from-shell-initialize)
+
+(gptel-make-privategpt "local_Llama-3.2-3B"
+:protocol "http"
+:host "192.168.0.8:8001"
+:stream t
+:context t
+:sources nil                        ; Set sources to false
+:models '(private-gpt))
+
+(setq gptel-default-mode 'org-mode)

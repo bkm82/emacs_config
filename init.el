@@ -124,6 +124,7 @@
 (global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
 
 (global-unset-key (kbd "C-z"))
+(global-set-key (kbd "C-j") 'promptless-projectile-test-project)
 
 (use-package doom-themes
   :init (load-theme 'wombat))
@@ -265,22 +266,22 @@
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
 
-  ;;(setq org-agenda-files
-  ;;      '("~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org"
-  ;;        "~/Projects/Code/emacs-from-scratch/OrgFiles/Habits.org"
-  ;;       "~/Projects/Code/emacs-from-scratch/OrgFiles/Birthdays.org"))
+  (setq org-agenda-files
+        '("~/org/agenda/agenda.org"
+          "~/org/agenda/habits.org"
+         "~/org/agenda/birthdays.org"))
 
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
   (setq org-habit-graph-column 60)
 
   (setq org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+          (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
   (setq org-refile-targets
-    '(("Archive.org" :maxlevel . 1)
-      ("Tasks.org" :maxlevel . 1)))
+    '(("~/org/agenda/agenda.archive.org" :maxlevel . 1)
+      ("~/org/agenda/agenda.org" :maxlevel . 1)))
 
   ;; Save Org buffers after refiling!
   (advice-add 'org-refile :after 'org-save-all-org-buffers)
@@ -292,10 +293,8 @@
        ("@errand" . ?E)
        ("@home" . ?H)
        ("@work" . ?W)
-       ("agenda" . ?a)
-       ("planning" . ?p)
-       ("publish" . ?P)
-       ("batch" . ?b)
+       ("class" . ?c)
+       ("research" . ?r)
        ("note" . ?n)
        ("idea" . ?i)))
 
@@ -304,14 +303,16 @@
    '(("d" "Dashboard"
      ((agenda "" ((org-deadline-warning-days 7)))
       (todo "NEXT"
-	((org-agenda-overriding-header "Next Tasks")))
+        ((org-agenda-overriding-header "Next Tasks")))
       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
     ("n" "Next Tasks"
      ((todo "NEXT"
-	((org-agenda-overriding-header "Next Tasks")))))
+        ((org-agenda-overriding-header "Next Tasks")))))
 
-    ("W" "Work Tasks" tags-todo "+work-email")
+    ("c" "Work Tasks" tags-todo "+class")
+
+    ("r" "Research Tasks" tags-todo "+research")
 
     ;; Low-effort next actions
     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
@@ -321,57 +322,57 @@
 
     ("w" "Workflow Status"
      ((todo "WAIT"
-	    ((org-agenda-overriding-header "Waiting on External")
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "Waiting on External")
+             (org-agenda-files org-agenda-files)))
       (todo "REVIEW"
-	    ((org-agenda-overriding-header "In Review")
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "In Review")
+             (org-agenda-files org-agenda-files)))
       (todo "PLAN"
-	    ((org-agenda-overriding-header "In Planning")
-	     (org-agenda-todo-list-sublevels nil)
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "In Planning")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
       (todo "BACKLOG"
-	    ((org-agenda-overriding-header "Project Backlog")
-	     (org-agenda-todo-list-sublevels nil)
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "Project Backlog")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
       (todo "READY"
-	    ((org-agenda-overriding-header "Ready for Work")
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
       (todo "ACTIVE"
-	    ((org-agenda-overriding-header "Active Projects")
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "Active Projects")
+             (org-agenda-files org-agenda-files)))
       (todo "COMPLETED"
-	    ((org-agenda-overriding-header "Completed Projects")
-	     (org-agenda-files org-agenda-files)))
+            ((org-agenda-overriding-header "Completed Projects")
+             (org-agenda-files org-agenda-files)))
       (todo "CANC"
-	    ((org-agenda-overriding-header "Cancelled Projects")
-	     (org-agenda-files org-agenda-files)))))))
+            ((org-agenda-overriding-header "Cancelled Projects")
+             (org-agenda-files org-agenda-files)))))))
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org" "Inbox")
-	   "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+      ("tt" "Task" entry (file+olp "~/org/agenda/agenda.org" "Inbox")
+           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
       ("j" "Journal Entries")
       ("jj" "Journal" entry
-	   (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-	   "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-	   ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-	   :clock-in :clock-resume
-	   :empty-lines 1)
+           (file+olp+datetree "~/org/agenda/journal.org")
+           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+           :clock-in :clock-resume
+           :empty-lines 1)
       ("jm" "Meeting" entry
-	   (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-	   "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-	   :clock-in :clock-resume
-	   :empty-lines 1)
+           (file+olp+datetree "~/org/agenda/journal.org")
+           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
 
       ("w" "Workflows")
-      ("we" "Checking Email" entry (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-	   "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+      ("we" "Checking Email" entry (file+olp+datetree "~/org/agenda/journal.org")
+           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
       ("m" "Metrics Capture")
-      ("mw" "Weight" table-line (file+headline "~/Projects/Code/emacs-from-scratch/OrgFiles/Metrics.org" "Weight")
-       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+      ("mw" "Pullups" table-line (file+headline "~/org/agenda/metrics.org" "Pullups")
+       "| %U | %^{Pullups} | %^{Notes} |" :kill-buffer t)))
 
   (define-key global-map (kbd "C-c j")
     (lambda () (interactive) (org-capture nil "jj")))
@@ -462,6 +463,27 @@
       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 ;; Add it to the org-latex-classes
 (with-eval-after-load 'ox-latex (add-to-list 'org-latex-classes ieeetran-class t))
+
+(setq asmeconf-class
+      '("asmeconf" "\\documentclass[]{asmeconf}"))
+
+(with-eval-after-load 'ox-latex (add-to-list 'org-latex-classes asmeconf-class t))
+
+(setq sb3c-class
+      '("sb3c"
+        "\\documentclass{sb3c}                  
+              [NO-DEFAULT-PACKAGES]
+              [PACKAGES]
+              [EXTRA]"
+        ("\\section{%s}" . "\\section*{%s}")
+        ("\\subsection{%s}" . "\\subsection*{%s}")
+        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ("\\subparagraph{%s}" . "\\subparagraph*{%s}")
+        )
+      )
+
+(with-eval-after-load 'ox-latex (add-to-list 'org-latex-classes sb3c-class t))
 
 ; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
@@ -666,9 +688,12 @@
    'python-toml :test "pytest")
   )
 
-; (use-package counsel-projectile
-;   :after projectile
-;   :config (counsel-projectile-mode))
+(defun promptless-projectile-test-project (&optional prompt)
+(interactive "P")
+(let ((compilation-read-command
+       nil
+       ))
+  (projectile-test-project prompt)))
 
 (use-package magit
    :commands magit-status
@@ -786,3 +811,58 @@
 :models '(private-gpt))
 
 (setq gptel-default-mode 'org-mode)
+
+(use-package org-ref)
+
+(setq reftex-default-bibliography '("~/masters/bibliography/references.bib"))
+
+(setq bibtex-completion-bibliography '("~/masters/bibliography/references.bib"
+  "~/masters/bibliography/archive.bib")
+      bibtex-completion-library-path '("~/masters/bibliography/bibtex-pdfs/")
+        bibtex-completion-notes-path "~/masters/bibliography/notes/"
+        bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+        bibtex-completion-additional-search-fields '(keywords)
+        bibtex-completion-display-formats
+        '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+          (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+          (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+          (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+        bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (call-process "open" nil 0 nil fpath)))
+
+(require 'bibtex)
+
+(setq bibtex-autokey-year-length 4
+      bibtex-autokey-name-year-separator "-"
+      bibtex-autokey-year-title-separator "-"
+      bibtex-autokey-titleword-separator "-"
+      bibtex-autokey-titlewords 2
+      bibtex-autokey-titlewords-stretch 1
+      bibtex-autokey-titleword-length 5)
+
+(define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
+
+(require 'org-ref)
+(require 'org-ref-ivy)
+(define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+(setq org-latex-pdf-process
+    '("pdflatex -interaction nonstopmode -output-directory %o %f"
+      "bibtex %b"
+      "pdflatex -interaction nonstopmode -output-directory %o %f"
+      "pdflatex -interaction nonstopmode -output-directory %o %f"))
+
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/roamnotes")
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point))
+  :config
+  (org-roam-setup))

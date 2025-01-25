@@ -302,17 +302,11 @@
   (setq org-agenda-custom-commands
    '(("d" "Dashboard"
      ((agenda "" ((org-deadline-warning-days 7)))
-      (todo "NEXT"
-        ((org-agenda-overriding-header "Next Tasks")))
-      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+      (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")))
+      (todo "ACTIVE" ((org-agenda-overriding-header "Active Projects")))
+      ))
 
-    ("n" "Next Tasks"
-     ((todo "NEXT"
-        ((org-agenda-overriding-header "Next Tasks")))))
-
-    ("c" "Work Tasks" tags-todo "+class")
-
-    ("r" "Research Tasks" tags-todo "+research")
+    ("t" "Thesis Tasks" tags-todo "+thesis")
 
     ;; Low-effort next actions
     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
@@ -874,18 +868,61 @@
         :unnarrowed t)
 
     ("p" "project" plain
-     "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project")
+     "* Description\n\n** Status \n\n %?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:")
         :unnarrowed t)))
 
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
+         ("C-c n I" . org-roam-node-insert-immediate)
          :map org-mode-map
          ("C-M-i" . completion-at-point))
 
   :config
-  (org-roam-setup))
+  (org-roam-db-autosync-mode))
+
+(defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (cons arg args))
+        (org-roam-capture-templates
+         (list
+          (append
+                (car org-roam-capture-templates)
+                '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
+
+(defun my/org-roam-filter-by-tag (tag-name)
+  (lambda (node)
+    (member tag-name (org-roam-node-tags node))))
+
+(defun my/org-roam-list-notes-by-tag (tag-name)
+  (mapcar #'org-roam-node-file
+          (seq-filter
+           (my/org-roam-filter-by-tag tag-name)
+           (org-roam-node-list))))
+
+(defun my/org-roam-refresh-agenda-list ()
+  (interactive)
+  (setq org-agenda-files (my/org-roam-list-notes-by-tag "agenda")))
+
+;; Build the agenda list the first time for the session
+(my/org-roam-refresh-agenda-list)
+
+(defun my/org-roam-find-project ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Select a project file to open, creating it if necessary
+  (org-roam-node-find
+   nil
+   nil
+   (my/org-roam-filter-by-tag "Project")
+   :templates
+   '(("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
+      :unnarrowed t))))
 
 (use-package websocket
     :after org-roam)
@@ -906,15 +943,3 @@
   :after org-roam
   :config
   (require 'org-ref))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(safe-local-variable-values '((org-startup-with-inline-images . true))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

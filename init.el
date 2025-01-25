@@ -858,6 +858,18 @@
   :custom
   (org-roam-directory "~/roamnotes")
   (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(
+     ("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)
+
+     ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#title: ${title}\n#+category: ${title}\n+filetags: Project")
+      :unnarrowed t)
+
+     ))
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
@@ -912,6 +924,18 @@ capture was not aborted."
     (with-current-buffer (org-capture-get :buffer)
       (add-to-list 'org-agenda-files (buffer-file-name)))))
 
+(defun my/org-roam-find-project ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Select a project file to open, creating it if necessary
+  (org-roam-node-find
+   nil
+   nil
+   (my/org-roam-filter-by-tag "Project")))
+
+
 (defun my/org-roam-capture-inbox ()
   (interactive)
   (org-roam-capture- :node (org-roam-node-create)
@@ -929,8 +953,31 @@ capture was not aborted."
                             (my/org-roam-filter-by-tag "agenda"))
                      :templates '(("p" "project" plain "** TODO %?"
                                    :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
-                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:"
                                                           ("Tasks"))))))
+(defun my/org-roam-copy-todo-to-today ()
+  (interactive)
+  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+        (org-roam-dailies-capture-templates
+          '(("t" "tasks" entry "%?"
+             :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+        (org-after-refile-insert-hook #'save-buffer)
+        today-file
+        pos)
+    (save-window-excursion
+      (org-roam-dailies--capture (current-time) t)
+      (setq today-file (buffer-file-name))
+      (setq pos (point)))
+
+    ;; Only refile if the target file is different than the current file
+    (unless (equal (file-truename today-file)
+                   (file-truename (buffer-file-name)))
+      (org-refile nil nil (list "Tasks" today-file nil pos)))))
+
+(add-to-list 'org-after-todo-state-change-hook
+             (lambda ()
+               (when (equal org-state "DONE")
+                 (my/org-roam-copy-todo-to-today))))
 
 (use-package websocket
     :after org-roam)

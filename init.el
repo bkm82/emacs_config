@@ -865,8 +865,8 @@
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
 
-     ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#title: ${title}\n#+category: ${title}\n+filetags: Project")
+     ("p" "project" plain "* Description\n\n** Status\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#title: ${title}\n#+category: ${title}\n+filetags: :agenda:Project:")
       :unnarrowed t)
 
      ))
@@ -874,6 +874,9 @@
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n I" . org-roam-node-insert-immediate)
+         ("C-c n p" . my/org-roam-find-project)
+         ("C-c n t" . my/org-roam-capture-task)
+         ("C-c n b" . my/org-roam-capture-inbox)
          :map org-mode-map
          ("C-M-i" . completion-at-point)
          :map org-roam-dailies-map

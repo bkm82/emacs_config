@@ -308,7 +308,7 @@
       (todo "ACTIVE" ((org-agenda-overriding-header "Active Projects")))
       ))
 
-    ("t" "Thesis Tasks" tags-todo "+thesis")
+    ("r" "Thesis Tasks" tags-todo "+thesis")
 
     ;; Low-effort next actions
     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
@@ -858,25 +858,6 @@
   :custom
   (org-roam-directory "~/roamnotes")
   (org-roam-completion-everywhere t)
-  (org-roam-capture-templates
-   '(("d" "default" plain
-        "\n* ${title} \n %?"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-        :unnarrowed t)
-     ("l" "class notes" plain
-      "* Characteristics\n\n- Family: %?\n- Inspired by: \n\n* Reference:\n\n"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-        :unnarrowed t)
-    ("c" "paper review" plain
-      (file "~/roamnotes/templates/paperreview_template.org")
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: research-paper")
-        :unnarrowed t)
-
-    ("p" "project" plain
-     "* Description\n\n** Status \n\n %?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:")
-        :unnarrowed t)))
-
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
@@ -892,25 +873,26 @@
   (require 'org-roam-dailies)
   (org-roam-db-autosync-mode))
 
+
 (defun org-roam-node-insert-immediate (arg &rest args)
   (interactive "P")
   (let ((args (cons arg args))
         (org-roam-capture-templates
          (list
           (append
-                (car org-roam-capture-templates)
-                '(:immediate-finish t)))))
+           (car org-roam-capture-templates)
+           '(:immediate-finish t)))))
     (apply #'org-roam-node-insert args)))
 
-(defun my/org-roam-filter-by-tag (tag-name)
-  (lambda (node)
-    (member tag-name (org-roam-node-tags node))))
+ (defun my/org-roam-filter-by-tag (tag-name)
+   (lambda (node)
+     (member tag-name (org-roam-node-tags node))))
 
-(defun my/org-roam-list-notes-by-tag (tag-name)
-  (mapcar #'org-roam-node-file
-          (seq-filter
-           (my/org-roam-filter-by-tag tag-name)
-           (org-roam-node-list))))
+ (defun my/org-roam-list-notes-by-tag (tag-name)
+   (mapcar #'org-roam-node-file
+           (seq-filter
+            (my/org-roam-filter-by-tag tag-name)
+            (org-roam-node-list))))
 
 (defun my/org-roam-refresh-agenda-list ()
   (interactive)
@@ -918,6 +900,37 @@
 
 ;; Build the agenda list the first time for the session
 (my/org-roam-refresh-agenda-list)
+
+(defun my/org-roam-project-finalize-hook ()
+  "Adds the captured project file to `org-agenda-files' if the
+capture was not aborted."
+  ;; Remove the hook since it was added temporarily
+  (remove-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Add project file to the agenda list if the capture was confirmed
+  (unless org-note-abort
+    (with-current-buffer (org-capture-get :buffer)
+      (add-to-list 'org-agenda-files (buffer-file-name)))))
+
+(defun my/org-roam-capture-inbox ()
+  (interactive)
+  (org-roam-capture- :node (org-roam-node-create)
+                     :templates '(("i" "inbox" plain "* %?"
+                                  :if-new (file+head+olp "inbox.org" "#+title: Inbox\n#+category: Inbox\n#+filetags: :agenda" ("Tasks"))))))
+
+(defun my/org-roam-capture-task ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Capture the new task, creating the project file if necessary
+  (org-roam-capture- :node (org-roam-node-read
+                            nil
+                            (my/org-roam-filter-by-tag "agenda"))
+                     :templates '(("p" "project" plain "** TODO %?"
+                                   :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                          ("Tasks"))))))
 
 (use-package websocket
     :after org-roam)

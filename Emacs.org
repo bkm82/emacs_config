@@ -1543,15 +1543,68 @@ source ~/.bashrc
     :custom
     (org-roam-directory "~/roamnotes")
     (org-roam-completion-everywhere t)
+    (org-roam-capture-templates
+     '(("d" "default" plain
+          "\n* ${title} \n %?"
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+       ("l" "class notes" plain
+        "* Characteristics\n\n- Family: %?\n- Inspired by: \n\n* Reference:\n\n"
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+      ("c" "paper review" plain
+        (file "~/roamnotes/templates/paperreview_template.org")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: research-paper")
+          :unnarrowed t)
+
+      ("p" "project" plain
+       "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project")
+          :unnarrowed t)))
+
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert)
            :map org-mode-map
            ("C-M-i" . completion-at-point))
+
     :config
     (org-roam-setup))
-
 #+end_src
 
 #+RESULTS:
 : completion-at-point
+
+* Org-Roam-UI
+Usage use M-x org-roam-ui-mode RET to enable global mode. This will start a server on http://127.0.0.1:35901/ connected via websocket
+ #+begin_src emacs-lisp
+   (use-package websocket
+       :after org-roam)
+
+   (use-package org-roam-ui
+       :after org-roam ;; or :after org
+   ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+   ;;         a hookable mode anymore, you're advised to pick something yourself
+   ;;         if you don't care about startup time, use
+       :hook (after-init . org-roam-ui-mode)
+       :config
+       (setq org-roam-ui-sync-theme t
+             org-roam-ui-follow t
+             org-roam-ui-update-on-save t
+             org-roam-ui-open-on-start t))
+   
+ #+end_src
+
+* Org-Roam-Bibtex
+A combination of org-roam and bibtex. Also includes "noter" which looks really helpful
+ #+begin_src emacs-lisp
+   (use-package org-roam-bibtex
+     :after org-roam
+     :config
+     (require 'org-ref))
+ #+end_src
+
+ #+RESULTS:
+ : t
+
+

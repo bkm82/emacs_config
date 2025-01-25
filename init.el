@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;; NOTE: init.el is now generated from Emacs.org.  Please edit that file
 ;; in Emacs and init.el will be generated automatically!
  (defvar efs/default-font-size 150)
@@ -366,7 +368,9 @@
 
       ("m" "Metrics Capture")
       ("mw" "Pullups" table-line (file+headline "~/org/agenda/metrics.org" "Pullups")
-       "| %U | %^{Pullups} | %^{Notes} |" :kill-buffer t)))
+       "| %U | %^{Pullups} | %^{Notes} |" :kill-buffer t)
+
+      ))
 
   (define-key global-map (kbd "C-c j")
     (lambda () (interactive) (org-capture nil "jj")))
@@ -850,6 +854,7 @@
 
 (use-package org-roam
   :ensure t
+  :demand t
   :custom
   (org-roam-directory "~/roamnotes")
   (org-roam-completion-everywhere t)
@@ -877,9 +882,14 @@
          ("C-c n i" . org-roam-node-insert)
          ("C-c n I" . org-roam-node-insert-immediate)
          :map org-mode-map
-         ("C-M-i" . completion-at-point))
-
+         ("C-M-i" . completion-at-point)
+         :map org-roam-dailies-map
+         ("Y" . org-roam-dailies-capture-yesterday)
+         ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
   :config
+  (require 'org-roam-dailies)
   (org-roam-db-autosync-mode))
 
 (defun org-roam-node-insert-immediate (arg &rest args)
@@ -909,21 +919,6 @@
 ;; Build the agenda list the first time for the session
 (my/org-roam-refresh-agenda-list)
 
-(defun my/org-roam-find-project ()
-  (interactive)
-  ;; Add the project file to the agenda after capture is finished
-  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
-
-  ;; Select a project file to open, creating it if necessary
-  (org-roam-node-find
-   nil
-   nil
-   (my/org-roam-filter-by-tag "Project")
-   :templates
-   '(("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
-      :unnarrowed t))))
-
 (use-package websocket
     :after org-roam)
 
@@ -937,7 +932,7 @@
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+          org-roam-ui-open-on-start nil))
 
 (use-package org-roam-bibtex
   :after org-roam

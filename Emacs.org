@@ -1623,7 +1623,21 @@ source ~/.bashrc
      (my/org-roam-filter-by-tag "Project")))
 
 
-  (defun my/org-roam-capture-inbox ()
+    (defun my/org-roam-capture-metrics ()
+    (interactive)
+    ;; Add the project file to the agenda after capture is finished
+    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+    ;; Capture the new task, creating the project file if necessary
+    (org-roam-capture- :node (org-roam-node-read
+                              nil
+                              (my/org-roam-filter-by-tag "agenda"))
+                       :templates '(("p" "project" table-line "| %U | %^{Pullups}| %^{Notes} |"
+                                     :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                            "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:metrics:"
+                                                            ("Table"))))))
+
+    (defun my/org-roam-capture-inbox ()
     (interactive)
     (org-roam-capture- :node (org-roam-node-create)
                        :templates '(("i" "inbox" plain "* %?"

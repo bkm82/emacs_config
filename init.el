@@ -445,6 +445,11 @@ If OTHERS is true, skip all entries that do not correspond to TAG."
                       "<rp"
                       "Insert an r code block with prefences")
 
+  (tempo-define-template "latex equation inline"
+                     '(" \\begin{equation} \n    " r "\n \\end{equation}" >)
+                      "<eq"
+                      "Insert a latex equation block")
+
   (tempo-define-template "python-block-with-latex"
                          '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC python :results output :exports both :session Python-Session \n    " r "\n#+END_SRC" >)
                          "<p"

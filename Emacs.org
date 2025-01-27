@@ -650,6 +650,11 @@ You can add more =src= block templates below by copying one of the lines and cha
                         "<rp"
                         "Insert an r code block with prefences")
 
+    (tempo-define-template "latex equation inline"
+                       '(" \\begin{equation} \n    " r "\n \\end{equation}" >)
+                        "<eq"
+                        "Insert a latex equation block")
+
     (tempo-define-template "python-block-with-latex"
                            '("#+ATTR_LATEX: :options frame=single\n#+BEGIN_SRC python :results output :exports both :session Python-Session \n    " r "\n#+END_SRC" >)
                            "<p"
@@ -664,7 +669,7 @@ You can add more =src= block templates below by copying one of the lines and cha
 #+end_src
 
 #+RESULTS:
-: tempo-template-r-plot-block-with-latex
+: tempo-template-python-plot-block-with-latex
 
 ** Latex Export
 #+begin_src emacs-lisp

@@ -432,6 +432,22 @@ The =efs/org-font-setup= function configures various text faces to tweak the siz
 This section contains the basic configuration for =org-mode= plus the configuration for Org agendas and capture templates.  There's a lot to unpack in here so I'd recommend watching the videos for [[https://youtu.be/VcgjTEa0kU4][Part 5]] and [[https://youtu.be/PNE-mgkZ6HM][Part 6]] for a full explanation.
 
 #+begin_src emacs-lisp
+  ;; Function to filter out a specicific tag from org agenda
+  (defun my/org-agenda-skip-tag (tag &optional others)
+    "Skip all entries that correspond to TAG.
+
+  If OTHERS is true, skip all entries that do not correspond to TAG."
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+          (current-headline (or (and (org-at-heading-p)
+                                     (point))
+                                (save-excursion (org-back-to-heading)))))
+      (if others
+          (if (not (member tag (org-get-tags-at current-headline)))
+              next-headline
+            nil)
+        (if (member tag (org-get-tags-at current-headline))
+            next-headline
+          nil))))
 
   (defun efs/org-mode-setup ()
     (org-indent-mode)
@@ -485,7 +501,11 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (setq org-agenda-custom-commands
      '(("d" "Dashboard"
        ((agenda "" ((org-deadline-warning-days 7)))
-        (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")))
+
+        (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")
+                      (org-agenda-skip-function
+                       '(my/org-agenda-skip-tag "habit" nil))
+                      ))
         (todo "ACTIVE" ((org-agenda-overriding-header "Active Projects")))
         ))
 
@@ -561,7 +581,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
 #+end_src
 
 #+RESULTS:
-| #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-ref-org-menu | org-tempo-setup | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | (closure (t) nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | efs/org-mode-visual-fill | org-bullets-mode | efs/org-mode-setup | (closure (t) nil (display-line-numbers-mode 0)) |
+| org-ref-org-menu | org-tempo-setup | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | (closure (t) nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | efs/org-mode-visual-fill | org-bullets-mode | efs/org-mode-setup | (closure (t) nil (display-line-numbers-mode 0)) |
 
 
 *** Nicer Heading Bullets

@@ -262,6 +262,23 @@
   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
   (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
+;; Function to filter out a specicific tag from org agenda
+(defun my/org-agenda-skip-tag (tag &optional others)
+  "Skip all entries that correspond to TAG.
+
+If OTHERS is true, skip all entries that do not correspond to TAG."
+  (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+        (current-headline (or (and (org-at-heading-p)
+                                   (point))
+                              (save-excursion (org-back-to-heading)))))
+    (if others
+        (if (not (member tag (org-get-tags-at current-headline)))
+            next-headline
+          nil)
+      (if (member tag (org-get-tags-at current-headline))
+          next-headline
+        nil))))
+
 (defun efs/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
@@ -314,7 +331,11 @@
   (setq org-agenda-custom-commands
    '(("d" "Dashboard"
      ((agenda "" ((org-deadline-warning-days 7)))
-      (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")))
+
+      (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")
+                    (org-agenda-skip-function
+                     '(my/org-agenda-skip-tag "habit" nil))
+                    ))
       (todo "ACTIVE" ((org-agenda-overriding-header "Active Projects")))
       ))
 

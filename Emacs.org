@@ -1772,8 +1772,9 @@ A combination of org-roam and bibtex. Also includes "noter" which looks really h
      (defun my-org-download-set-dir ()
        "Set `org-download-image-dir` to the directory of the current 
            buffer's file."
+       (when (buffer-file-name)
        (setq-local org-download-image-dir (concat (file-name-directory 
-                                                   (buffer-file-name)) "images/" (file-name-base buffer-file-name) "/") ))
+                                                   (buffer-file-name)) "images/" (file-name-base buffer-file-name) "/") )))
      :hook
      ((org-mode . my-org-download-set-dir))
      :custom
@@ -1784,3 +1785,15 @@ A combination of org-roam and bibtex. Also includes "noter" which looks really h
 
  #+RESULTS:
  : org-download-screenshot
+* Org-Fragtog
+Automatically toggle latex fragements previews when the cursor enters themm
+
+ #+begin_src emacs-lisp
+
+   (use-package org-fragtog
+     :after org
+     )
+   (add-hook 'org-mode-hook 'org-fragtog-mode)
+ #+end_src
+
+ 

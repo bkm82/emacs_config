@@ -1063,11 +1063,17 @@ capture was not aborted."
   (defun my-org-download-set-dir ()
     "Set `org-download-image-dir` to the directory of the current 
         buffer's file."
+    (when (buffer-file-name)
     (setq-local org-download-image-dir (concat (file-name-directory 
-                                                (buffer-file-name)) "images/" (file-name-base buffer-file-name) "/") ))
+                                                (buffer-file-name)) "images/" (file-name-base buffer-file-name) "/") )))
   :hook
   ((org-mode . my-org-download-set-dir))
   :custom
   (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\"")
 
   )
+
+(use-package org-fragtog
+  :after org
+  )
+(add-hook 'org-mode-hook 'org-fragtog-mode)

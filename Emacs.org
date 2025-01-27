@@ -6,7 +6,8 @@
 
 * Notes
 ** Python
-In a pythons virtual enviroment install "debugpy" to work with dapmode
+In a pythons virtual enviroment install "debugpy" to work with dapmod
+
 
 * Welcome!
 
@@ -26,6 +27,18 @@ make a test for thsi
 
 #+end_src
 
+* Toggle todo
+#+begin_src emacs-lisp
+    (defun my/org-toggle-first-todo-done ()
+    "Toggle the first TODO in the buffer to DONE if capture was confirmed."
+    (remove-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
+    (unless org-note-abort
+      (with-current-buffer (org-capture-get :buffer)
+        (save-excursion
+          (goto-char (point-min))
+          (when (re-search-forward "\\* TODO" nil t)
+            (org-todo 'done))))))
+#+end_src
 
 * Startup Performance
 
@@ -420,130 +433,130 @@ This section contains the basic configuration for =org-mode= plus the configurat
 
 #+begin_src emacs-lisp
 
-    (defun efs/org-mode-setup ()
-      (org-indent-mode)
-      (variable-pitch-mode 1)
-      (visual-line-mode 1))
+  (defun efs/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (visual-line-mode 1))
 
-    (use-package org
-      :pin org
-      :commands (org-capture org-agenda)
-      :hook (org-mode . efs/org-mode-setup)
-      :config
-      (setq org-ellipsis " ▾")
+  (use-package org
+    :pin org
+    :commands (org-capture org-agenda)
+    :hook (org-mode . efs/org-mode-setup)
+    :config
+    (setq org-ellipsis " ▾")
 
-      (setq org-agenda-start-with-log-mode t)
-      (setq org-log-done 'time)
-      (setq org-log-into-drawer t)
+    (setq org-agenda-start-with-log-mode t)
+    (setq org-log-done 'time)
+    (setq org-log-into-drawer t)
+    ;; This was removed as org-agenda-files are now set using org-roam
+    ;; (setq org-agenda-files
+    ;;       '("~/org/agenda/agenda.org"
+    ;;         "~/org/agenda/habits.org"
+    ;;        "~/org/agenda/birthdays.org"))
 
-      (setq org-agenda-files
-            '("~/org/agenda/agenda.org"
-              "~/org/agenda/habits.org"
-             "~/org/agenda/birthdays.org"))
+    (require 'org-habit)
+    (add-to-list 'org-modules 'org-habit)
+    (setq org-habit-graph-column 60)
 
-      (require 'org-habit)
-      (add-to-list 'org-modules 'org-habit)
-      (setq org-habit-graph-column 60)
+    (setq org-todo-keywords
+          '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+            (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
-      (setq org-todo-keywords
-            '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-              (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+    (setq org-refile-targets
+      '(("~/org/agenda/agenda.archive.org" :maxlevel . 1)
+        ("~/org/agenda/agenda.org" :maxlevel . 1)))
 
-      (setq org-refile-targets
-        '(("~/org/agenda/agenda.archive.org" :maxlevel . 1)
-          ("~/org/agenda/agenda.org" :maxlevel . 1)))
+    ;; Save Org buffers after refiling!
+    (advice-add 'org-refile :after 'org-save-all-org-buffers)
 
-      ;; Save Org buffers after refiling!
-      (advice-add 'org-refile :after 'org-save-all-org-buffers)
+    (setq org-tag-alist
+      '((:startgroup)
+         ; Put mutually exclusive tags here
+         (:endgroup)
+         ("@errand" . ?E)
+         ("@home" . ?H)
+         ("@work" . ?W)
+         ("class" . ?c)
+         ("research" . ?r)
+         ("note" . ?n)
+         ("idea" . ?i)))
 
-      (setq org-tag-alist
-        '((:startgroup)
-           ; Put mutually exclusive tags here
-           (:endgroup)
-           ("@errand" . ?E)
-           ("@home" . ?H)
-           ("@work" . ?W)
-           ("class" . ?c)
-           ("research" . ?r)
-           ("note" . ?n)
-           ("idea" . ?i)))
+    ;; Configure custom agenda views
+    (setq org-agenda-custom-commands
+     '(("d" "Dashboard"
+       ((agenda "" ((org-deadline-warning-days 7)))
+        (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")))
+        (todo "ACTIVE" ((org-agenda-overriding-header "Active Projects")))
+        ))
 
-      ;; Configure custom agenda views
-      (setq org-agenda-custom-commands
-       '(("d" "Dashboard"
-         ((agenda "" ((org-deadline-warning-days 7)))
-          (todo "TODO" ((org-agenda-overriding-header "TODO Tasks")))
-          (todo "ACTIVE" ((org-agenda-overriding-header "Active Projects")))
-          ))
+      ("r" "Thesis Tasks" tags-todo "+thesis")
 
-        ("r" "Thesis Tasks" tags-todo "+thesis")
+      ;; Low-effort next actions
+      ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+       ((org-agenda-overriding-header "Low Effort Tasks")
+        (org-agenda-max-todos 20)
+        (org-agenda-files org-agenda-files)))
 
-        ;; Low-effort next actions
-        ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-         ((org-agenda-overriding-header "Low Effort Tasks")
-          (org-agenda-max-todos 20)
-          (org-agenda-files org-agenda-files)))
+      ("w" "Workflow Status"
+       ((todo "WAIT"
+              ((org-agenda-overriding-header "Waiting on External")
+               (org-agenda-files org-agenda-files)))
+        (todo "REVIEW"
+              ((org-agenda-overriding-header "In Review")
+               (org-agenda-files org-agenda-files)))
+        (todo "PLAN"
+              ((org-agenda-overriding-header "In Planning")
+               (org-agenda-todo-list-sublevels nil)
+               (org-agenda-files org-agenda-files)))
+        (todo "BACKLOG"
+              ((org-agenda-overriding-header "Project Backlog")
+               (org-agenda-todo-list-sublevels nil)
+               (org-agenda-files org-agenda-files)))
+        (todo "READY"
+              ((org-agenda-overriding-header "Ready for Work")
+               (org-agenda-files org-agenda-files)))
+        (todo "ACTIVE"
+              ((org-agenda-overriding-header "Active Projects")
+               (org-agenda-files org-agenda-files)))
+        (todo "COMPLETED"
+              ((org-agenda-overriding-header "Completed Projects")
+               (org-agenda-files org-agenda-files)))
+        (todo "CANC"
+              ((org-agenda-overriding-header "Cancelled Projects")
+               (org-agenda-files org-agenda-files)))))))
 
-        ("w" "Workflow Status"
-         ((todo "WAIT"
-                ((org-agenda-overriding-header "Waiting on External")
-                 (org-agenda-files org-agenda-files)))
-          (todo "REVIEW"
-                ((org-agenda-overriding-header "In Review")
-                 (org-agenda-files org-agenda-files)))
-          (todo "PLAN"
-                ((org-agenda-overriding-header "In Planning")
-                 (org-agenda-todo-list-sublevels nil)
-                 (org-agenda-files org-agenda-files)))
-          (todo "BACKLOG"
-                ((org-agenda-overriding-header "Project Backlog")
-                 (org-agenda-todo-list-sublevels nil)
-                 (org-agenda-files org-agenda-files)))
-          (todo "READY"
-                ((org-agenda-overriding-header "Ready for Work")
-                 (org-agenda-files org-agenda-files)))
-          (todo "ACTIVE"
-                ((org-agenda-overriding-header "Active Projects")
-                 (org-agenda-files org-agenda-files)))
-          (todo "COMPLETED"
-                ((org-agenda-overriding-header "Completed Projects")
-                 (org-agenda-files org-agenda-files)))
-          (todo "CANC"
-                ((org-agenda-overriding-header "Cancelled Projects")
-                 (org-agenda-files org-agenda-files)))))))
+    (setq org-capture-templates
+      `(("t" "Tasks / Projects")
+        ("tt" "Task" entry (file+olp "~/org/agenda/agenda.org" "Inbox")
+             "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-      (setq org-capture-templates
-        `(("t" "Tasks / Projects")
-          ("tt" "Task" entry (file+olp "~/org/agenda/agenda.org" "Inbox")
-               "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+        ("j" "Journal Entries")
+        ("jj" "Journal" entry
+             (file+olp+datetree "~/org/agenda/journal.org")
+             "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+             ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+             :clock-in :clock-resume
+             :empty-lines 1)
+        ("jm" "Meeting" entry
+             (file+olp+datetree "~/org/agenda/journal.org")
+             "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+             :clock-in :clock-resume
+             :empty-lines 1)
 
-          ("j" "Journal Entries")
-          ("jj" "Journal" entry
-               (file+olp+datetree "~/org/agenda/journal.org")
-               "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-               ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-               :clock-in :clock-resume
-               :empty-lines 1)
-          ("jm" "Meeting" entry
-               (file+olp+datetree "~/org/agenda/journal.org")
-               "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-               :clock-in :clock-resume
-               :empty-lines 1)
+        ("w" "Workflows")
+        ("we" "Checking Email" entry (file+olp+datetree "~/org/agenda/journal.org")
+             "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
-          ("w" "Workflows")
-          ("we" "Checking Email" entry (file+olp+datetree "~/org/agenda/journal.org")
-               "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+        ("m" "Metrics Capture")
+        ("mw" "Pullups" table-line (file+headline "~/org/agenda/metrics.org" "Pullups")
+         "| %U | %^{Pullups} | %^{Notes} |" :kill-buffer t)
 
-          ("m" "Metrics Capture")
-          ("mw" "Pullups" table-line (file+headline "~/org/agenda/metrics.org" "Pullups")
-           "| %U | %^{Pullups} | %^{Notes} |" :kill-buffer t)
+        ))
 
-          ))
+    (define-key global-map (kbd "C-c j")
+      (lambda () (interactive) (org-capture nil "jj")))
 
-      (define-key global-map (kbd "C-c j")
-        (lambda () (interactive) (org-capture nil "jj")))
-
-      (efs/org-font-setup))
+    (efs/org-font-setup))
 
 #+end_src
 
@@ -1561,8 +1574,8 @@ source ~/.bashrc
            ("C-c n p" . my/org-roam-find-project)
            ("C-c n t" . my/org-roam-capture-task)
            ("C-c n b" . my/org-roam-capture-inbox)
-           :map org-mode-map
-           ("C-M-i" . completion-at-point)
+           ;; :map org-mode-map
+           ;; ("C-M-i" . completion-at-point)
            :map org-roam-dailies-map
            ("Y" . org-roam-dailies-capture-yesterday)
            ("T" . org-roam-dailies-capture-tomorrow))
@@ -1611,6 +1624,8 @@ source ~/.bashrc
       (with-current-buffer (org-capture-get :buffer)
         (add-to-list 'org-agenda-files (buffer-file-name)))))
 
+
+
   (defun my/org-roam-find-project ()
     (interactive)
     ;; Add the project file to the agenda after capture is finished
@@ -1628,11 +1643,13 @@ source ~/.bashrc
     ;; Add the project file to the agenda after capture is finished
     (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
 
+    (add-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
+
     ;; Capture the new task, creating the project file if necessary
     (org-roam-capture- :node (org-roam-node-read
                               nil
-                              (my/org-roam-filter-by-tag "agenda"))
-                       :templates '(("t" "table" table-line "|%U | %^{Pullups} | %^{Notes} |"
+                              (my/org-roam-filter-by-tag "metrics"))
+                       :templates '(("t" "table" table-line "|%U | %^{${title}} | %^{Notes} |"
                                      :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                                                             "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:metrics:\n\n* Completion Record \n\n** TODO ${title}\nSCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1d\")\n:PROPERTIES:\n:STYLE:    habit\n:END: \n\n* Table\n| Time Stamp | ${title}    | Notes     |\n"("Table"))))))
 
@@ -1655,29 +1672,29 @@ source ~/.bashrc
                                      :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                                                             "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:"
                                                             ("Tasks"))))))
-  (defun my/org-roam-copy-todo-to-today ()
-    (interactive)
-    (let ((org-refile-keep t) ;; Set this to nil to delete the original!
-          (org-roam-dailies-capture-templates
-            '(("t" "tasks" entry "%?"
-               :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
-          (org-after-refile-insert-hook #'save-buffer)
-          today-file
-          pos)
-      (save-window-excursion
-        (org-roam-dailies--capture (current-time) t)
-        (setq today-file (buffer-file-name))
-        (setq pos (point)))
+  ;; (defun my/org-roam-copy-todo-to-today ()
+  ;;   (interactive)
+  ;;   (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+  ;;         (org-roam-dailies-capture-templates
+  ;;           '(("t" "tasks" entry "%?"
+  ;;              :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+  ;;         (org-after-refile-insert-hook #'save-buffer)
+  ;;         today-file
+  ;;         pos)
+  ;;     (save-window-excursion
+  ;;       (org-roam-dailies--capture (current-time) t)
+  ;;       (setq today-file (buffer-file-name))
+  ;;       (setq pos (point)))
 
-      ;; Only refile if the target file is different than the current file
-      (unless (equal (file-truename today-file)
-                     (file-truename (buffer-file-name)))
-        (org-refile nil nil (list "Tasks" today-file nil pos)))))
+  ;;     ;; Only refile if the target file is different than the current file
+  ;;     (unless (equal (file-truename today-file)
+  ;;                    (file-truename (buffer-file-name)))
+  ;;       (org-refile nil nil (list "Tasks" today-file nil pos)))))
 
-  (add-to-list 'org-after-todo-state-change-hook
-               (lambda ()
-                 (when (equal org-state "DONE")
-                   (my/org-roam-copy-todo-to-today))))
+  ;; (add-to-list 'org-after-todo-state-change-hook
+  ;;              (lambda ()
+  ;;                (when (equal org-state "DONE")
+  ;;                  (my/org-roam-copy-todo-to-today))))
  #+end_src
 
  #+RESULTS:
@@ -1689,7 +1706,7 @@ source ~/.bashrc
 Find just the project files, creating a new project if it does not exists
 
 
-* Org-Roam-UI
+* COMMENT Org-Roam-UI
 Usage use M-x org-roam-ui-mode RET to enable global mode. This will start a server on http://127.0.0.1:35901/ connected via websocket
  #+begin_src emacs-lisp
    (use-package websocket
@@ -1709,7 +1726,7 @@ Usage use M-x org-roam-ui-mode RET to enable global mode. This will start a serv
    
  #+end_src
 
-* Org-Roam-Bibtex
+* COMMENT Org-Roam-Bibtex
 A combination of org-roam and bibtex. Also includes "noter" which looks really helpful
  #+begin_src emacs-lisp
    (use-package org-roam-bibtex

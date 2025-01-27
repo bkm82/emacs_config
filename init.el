@@ -8,6 +8,16 @@
 ;; Make frame transparency overridable
 ;;(defvar efs/frame-transparency '(10 . 10))
 
+(defun my/org-toggle-first-todo-done ()
+"Toggle the first TODO in the buffer to DONE if capture was confirmed."
+(remove-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
+(unless org-note-abort
+  (with-current-buffer (org-capture-get :buffer)
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "\\* TODO" nil t)
+        (org-todo 'done))))))
+
 ;; e default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
 
@@ -267,11 +277,11 @@
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
-
-  (setq org-agenda-files
-        '("~/org/agenda/agenda.org"
-          "~/org/agenda/habits.org"
-         "~/org/agenda/birthdays.org"))
+  ;; This was removed as org-agenda-files are now set using org-roam
+  ;; (setq org-agenda-files
+  ;;       '("~/org/agenda/agenda.org"
+  ;;         "~/org/agenda/habits.org"
+  ;;        "~/org/agenda/birthdays.org"))
 
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
@@ -877,8 +887,8 @@
          ("C-c n p" . my/org-roam-find-project)
          ("C-c n t" . my/org-roam-capture-task)
          ("C-c n b" . my/org-roam-capture-inbox)
-         :map org-mode-map
-         ("C-M-i" . completion-at-point)
+         ;; :map org-mode-map
+         ;; ("C-M-i" . completion-at-point)
          :map org-roam-dailies-map
          ("Y" . org-roam-dailies-capture-yesterday)
          ("T" . org-roam-dailies-capture-tomorrow))
@@ -927,6 +937,8 @@ capture was not aborted."
     (with-current-buffer (org-capture-get :buffer)
       (add-to-list 'org-agenda-files (buffer-file-name)))))
 
+
+
 (defun my/org-roam-find-project ()
   (interactive)
   ;; Add the project file to the agenda after capture is finished
@@ -944,11 +956,13 @@ capture was not aborted."
   ;; Add the project file to the agenda after capture is finished
   (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
 
+  (add-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
+
   ;; Capture the new task, creating the project file if necessary
   (org-roam-capture- :node (org-roam-node-read
                             nil
-                            (my/org-roam-filter-by-tag "agenda"))
-                     :templates '(("t" "table" table-line "|%U | %^{Pullups} | %^{Notes} |"
+                            (my/org-roam-filter-by-tag "metrics"))
+                     :templates '(("t" "table" table-line "|%U | %^{${title}} | %^{Notes} |"
                                    :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                                                           "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:metrics:\n\n* Completion Record \n\n** TODO ${title}\nSCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1d\")\n:PROPERTIES:\n:STYLE:    habit\n:END: \n\n* Table\n| Time Stamp | ${title}    | Notes     |\n"("Table"))))))
 
@@ -971,46 +985,26 @@ capture was not aborted."
                                    :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                                                           "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:"
                                                           ("Tasks"))))))
-(defun my/org-roam-copy-todo-to-today ()
-  (interactive)
-  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
-        (org-roam-dailies-capture-templates
-          '(("t" "tasks" entry "%?"
-             :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
-        (org-after-refile-insert-hook #'save-buffer)
-        today-file
-        pos)
-    (save-window-excursion
-      (org-roam-dailies--capture (current-time) t)
-      (setq today-file (buffer-file-name))
-      (setq pos (point)))
+;; (defun my/org-roam-copy-todo-to-today ()
+;;   (interactive)
+;;   (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+;;         (org-roam-dailies-capture-templates
+;;           '(("t" "tasks" entry "%?"
+;;              :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+;;         (org-after-refile-insert-hook #'save-buffer)
+;;         today-file
+;;         pos)
+;;     (save-window-excursion
+;;       (org-roam-dailies--capture (current-time) t)
+;;       (setq today-file (buffer-file-name))
+;;       (setq pos (point)))
 
-    ;; Only refile if the target file is different than the current file
-    (unless (equal (file-truename today-file)
-                   (file-truename (buffer-file-name)))
-      (org-refile nil nil (list "Tasks" today-file nil pos)))))
+;;     ;; Only refile if the target file is different than the current file
+;;     (unless (equal (file-truename today-file)
+;;                    (file-truename (buffer-file-name)))
+;;       (org-refile nil nil (list "Tasks" today-file nil pos)))))
 
-(add-to-list 'org-after-todo-state-change-hook
-             (lambda ()
-               (when (equal org-state "DONE")
-                 (my/org-roam-copy-todo-to-today))))
-
-(use-package websocket
-    :after org-roam)
-
-(use-package org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-    :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start nil))
-
-(use-package org-roam-bibtex
-  :after org-roam
-  :config
-  (require 'org-ref))
+;; (add-to-list 'org-after-todo-state-change-hook
+;;              (lambda ()
+;;                (when (equal org-state "DONE")
+;;                  (my/org-roam-copy-todo-to-today))))

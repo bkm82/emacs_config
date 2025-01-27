@@ -948,10 +948,9 @@ capture was not aborted."
   (org-roam-capture- :node (org-roam-node-read
                             nil
                             (my/org-roam-filter-by-tag "agenda"))
-                     :templates '(("p" "project" table-line "| %U | %^{Pullups}| %^{Notes} |"
+                     :templates '(("t" "table" table-line "|%U | %^{Pullups} | %^{Notes} |"
                                    :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
-                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:metrics:"
-                                                          ("Table"))))))
+                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:metrics:\n\n* Completion Record \n\n** TODO ${title}\nSCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1d\")\n:PROPERTIES:\n:STYLE:    habit\n:END: \n\n* Table\n| Time Stamp | ${title}    | Notes     |\n"("Table"))))))
 
   (defun my/org-roam-capture-inbox ()
   (interactive)

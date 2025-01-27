@@ -8,16 +8,6 @@
 ;; Make frame transparency overridable
 ;;(defvar efs/frame-transparency '(10 . 10))
 
-(defun my/org-toggle-first-todo-done ()
-"Toggle the first TODO in the buffer to DONE if capture was confirmed."
-(remove-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
-(unless org-note-abort
-  (with-current-buffer (org-capture-get :buffer)
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "\\* TODO" nil t)
-        (org-todo 'done))))))
-
 ;; e default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
 
@@ -948,6 +938,16 @@ If OTHERS is true, skip all entries that do not correspond to TAG."
 ;; Build the agenda list the first time for the session
 (my/org-roam-refresh-agenda-list)
 
+(defun my/org-toggle-first-todo-done ()
+  "Toggle the first TODO in the buffer to DONE if capture was confirmed."
+  (remove-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
+  (unless org-note-abort
+    (with-current-buffer (org-capture-get :buffer)
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "\\* TODO" nil t)
+          (org-todo 'done))))))
+
 (defun my/org-roam-project-finalize-hook ()
   "Adds the captured project file to `org-agenda-files' if the
 capture was not aborted."
@@ -1030,3 +1030,44 @@ capture was not aborted."
 ;;              (lambda ()
 ;;                (when (equal org-state "DONE")
 ;;                  (my/org-roam-copy-todo-to-today))))
+
+(use-package websocket
+    :after org-roam)
+
+(use-package org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start nil))
+
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (require 'org-ref))
+
+(use-package org-download
+  :after org
+  :bind
+  (:map org-mode-map
+        (
+         ("C-M-S-Y" . org-download-screenshot)
+         )
+  )
+  :config
+  (defun my-org-download-set-dir ()
+    "Set `org-download-image-dir` to the directory of the current 
+        buffer's file."
+    (setq-local org-download-image-dir (concat (file-name-directory 
+                                                (buffer-file-name)) "images/" (file-name-base buffer-file-name) "/") ))
+  :hook
+  ((org-mode . my-org-download-set-dir))
+  :custom
+  (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\"")
+
+  )

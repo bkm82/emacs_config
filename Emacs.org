@@ -27,19 +27,6 @@ make a test for thsi
 
 #+end_src
 
-* Toggle todo
-#+begin_src emacs-lisp
-    (defun my/org-toggle-first-todo-done ()
-    "Toggle the first TODO in the buffer to DONE if capture was confirmed."
-    (remove-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
-    (unless org-note-abort
-      (with-current-buffer (org-capture-get :buffer)
-        (save-excursion
-          (goto-char (point-min))
-          (when (re-search-forward "\\* TODO" nil t)
-            (org-todo 'done))))))
-#+end_src
-
 * Startup Performance
 
 #+begin_src emacs-lisp
@@ -1634,6 +1621,16 @@ source ~/.bashrc
   ;; Build the agenda list the first time for the session
   (my/org-roam-refresh-agenda-list)
 
+  (defun my/org-toggle-first-todo-done ()
+    "Toggle the first TODO in the buffer to DONE if capture was confirmed."
+    (remove-hook 'org-capture-after-finalize-hook #'my/org-toggle-first-todo-done)
+    (unless org-note-abort
+      (with-current-buffer (org-capture-get :buffer)
+        (save-excursion
+          (goto-char (point-min))
+          (when (re-search-forward "\\* TODO" nil t)
+            (org-todo 'done))))))
+
   (defun my/org-roam-project-finalize-hook ()
     "Adds the captured project file to `org-agenda-files' if the
   capture was not aborted."
@@ -1727,7 +1724,7 @@ source ~/.bashrc
 Find just the project files, creating a new project if it does not exists
 
 
-* COMMENT Org-Roam-UI
+* Org-Roam-UI
 Usage use M-x org-roam-ui-mode RET to enable global mode. This will start a server on http://127.0.0.1:35901/ connected via websocket
  #+begin_src emacs-lisp
    (use-package websocket
@@ -1747,7 +1744,7 @@ Usage use M-x org-roam-ui-mode RET to enable global mode. This will start a serv
    
  #+end_src
 
-* COMMENT Org-Roam-Bibtex
+* Org-Roam-Bibtex
 A combination of org-roam and bibtex. Also includes "noter" which looks really helpful
  #+begin_src emacs-lisp
    (use-package org-roam-bibtex
@@ -1760,3 +1757,30 @@ A combination of org-roam and bibtex. Also includes "noter" which looks really h
  : t
 
 
+* Org-download
+ #+begin_src emacs-lisp
+
+   (use-package org-download
+     :after org
+     :bind
+     (:map org-mode-map
+           (
+            ("C-M-S-Y" . org-download-screenshot)
+            )
+     )
+     :config
+     (defun my-org-download-set-dir ()
+       "Set `org-download-image-dir` to the directory of the current 
+           buffer's file."
+       (setq-local org-download-image-dir (concat (file-name-directory 
+                                                   (buffer-file-name)) "images/" (file-name-base buffer-file-name) "/") ))
+     :hook
+     ((org-mode . my-org-download-set-dir))
+     :custom
+     (org-download-screenshot-method "powershell.exe -Command \"(Get-Clipboard -Format image).Save('$(wslpath -w %s)')\"")
+
+     )
+ #+end_src
+
+ #+RESULTS:
+ : org-download-screenshot

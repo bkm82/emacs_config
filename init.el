@@ -544,6 +544,7 @@ If OTHERS is true, skip all entries that do not correspond to TAG."
        org-latex-packages-alist '(("" "minted"))
        org-latex-pdf-process
        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+         "bibtex %b"
          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
@@ -872,11 +873,13 @@ If OTHERS is true, skip all entries that do not correspond to TAG."
 (require 'org-ref)
 (require 'org-ref-ivy)
 (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-(setq org-latex-pdf-process
-    '("pdflatex -interaction nonstopmode -output-directory %o %f"
-      "bibtex %b"
-      "pdflatex -interaction nonstopmode -output-directory %o %f"
-      "pdflatex -interaction nonstopmode -output-directory %o %f"))
+
+
+  ;; (setq org-latex-pdf-process
+  ;;     '("pdflatex -interaction nonstopmode -output-directory %o %f"
+  ;;       "bibtex %b"
+  ;;       "pdflatex -interaction nonstopmode -output-directory %o %f"
+  ;;       "pdflatex -interaction nonstopmode -output-directory %o %f"))
 
 (use-package org-roam
   :ensure t
@@ -887,7 +890,7 @@ If OTHERS is true, skip all entries that do not correspond to TAG."
   (org-roam-capture-templates
    '(
      ("d" "default" plain
-      "%?"
+      "* ${title}\n\n%?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
 
@@ -1082,3 +1085,7 @@ capture was not aborted."
   :after org
   )
 (add-hook 'org-mode-hook 'org-fragtog-mode)
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+(use-package cdlatex)
+(add-hook 'org-mode-hook #'turn-on-org-cdlatex)

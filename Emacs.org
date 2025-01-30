@@ -756,6 +756,7 @@ You can add more =src= block templates below by copying one of the lines and cha
          org-latex-packages-alist '(("" "minted"))
          org-latex-pdf-process
          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "bibtex %b"
            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
@@ -1549,11 +1550,13 @@ source ~/.bashrc
   (require 'org-ref)
   (require 'org-ref-ivy)
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  (setq org-latex-pdf-process
-      '("pdflatex -interaction nonstopmode -output-directory %o %f"
-	"bibtex %b"
-	"pdflatex -interaction nonstopmode -output-directory %o %f"
-	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+
+
+    ;; (setq org-latex-pdf-process
+    ;;     '("pdflatex -interaction nonstopmode -output-directory %o %f"
+    ;;       "bibtex %b"
+    ;;       "pdflatex -interaction nonstopmode -output-directory %o %f"
+    ;;       "pdflatex -interaction nonstopmode -output-directory %o %f"))
 #+end_src
 
 #+RESULTS:
@@ -1570,7 +1573,7 @@ source ~/.bashrc
     (org-roam-capture-templates
      '(
        ("d" "default" plain
-        "%?"
+        "* ${title}\n\n%?"
         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
         :unnarrowed t)
 
@@ -1799,6 +1802,14 @@ Automatically toggle latex fragements previews when the cursor enters themm
      :after org
      )
    (add-hook 'org-mode-hook 'org-fragtog-mode)
+   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
  #+end_src
 
+
  
+* CDLlatex
+
+#+begin_src emacs-lisp
+(use-package cdlatex)
+(add-hook 'org-mode-hook #'turn-on-org-cdlatex)
+#+end_src

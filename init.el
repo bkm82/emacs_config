@@ -898,6 +898,10 @@ If OTHERS is true, skip all entries that do not correspond to TAG."
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:")
       :unnarrowed t)
 
+     ("r" "Research Paper" plain (file "~/roamnotes/templates/paperreview_template.org")
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :research-paper")
+      :unnarrowed t)
+
      ))
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
@@ -1058,6 +1062,8 @@ capture was not aborted."
   :after org-roam
   :config
   (require 'org-ref))
+
+(require 'org-roam-export)
 
 (use-package org-download
   :after org

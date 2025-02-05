@@ -1580,6 +1580,10 @@ source ~/.bashrc
        ("p" "project" plain "* Description\n\n** Status\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :agenda:Project:")
         :unnarrowed t)
+       
+       ("r" "Research Paper" plain (file "~/roamnotes/templates/paperreview_template.org")
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :research-paper")
+        :unnarrowed t)
 
        ))
     :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -1764,6 +1768,13 @@ A combination of org-roam and bibtex. Also includes "noter" which looks really h
  #+RESULTS:
  : t
 
+* Org-Roam-Export
+#+begin_src emacs-lisp
+(require 'org-roam-export)
+#+end_src
+
+#+RESULTS:
+: org-roam-export
 
 * Org-download
  #+begin_src emacs-lisp

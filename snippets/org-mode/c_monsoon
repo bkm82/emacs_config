@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: monsoon
+# key: <c_monsoon
+# --
+
+#+ATTR_LATEX: :options frame=single
+#+BEGIN_SRC sh :results output :exports code :tangle ./CS522_a${1:#}_bkm82/jobscript_${2:assignment_name}_act${3:#}_bkm82.sh
+  #!/bin/bash
+  #SBATCH --job-name=
+  #SBATCH --output=/scratch/bkm82/${2}_act${3}.out	
+  #SBATCH --error=/scratch/bkm82/${2}_act${3}.err
+  #SBATCH --time=05:00				# 5 min
+  #SBATCH --mem=4000 
+  #SBATCH --ntasks=50
+  #SBATCH --cpus-per-task=1
+  module load openmpi
+
+  directory="cs522/CS522_a${1}_bkm82"
+  filename = "${2}_act${3}_bkm82.sh"
+  mpicc -03 "\${directory}/\${file_name}.c" -lm -o "\${directory}/\${file_name}"
+  srun "\${directory}/\${file_name}"
+
+  $0
+#+END_SRC

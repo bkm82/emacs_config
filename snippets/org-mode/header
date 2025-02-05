@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: header
+# key: <header
+# --
+
+#+TITLE: ${1:title}
+#+AUTHOR: Bray Moll
+#+OPTIONS: toc:nil
+#+SETUPFILE: ~/masters/bray-standard-latex-export.org
+#+OPTIONS: ^:nil
+
+$0

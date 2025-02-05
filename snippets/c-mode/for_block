@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: for_block
+# key: for
+# --
+for (${1:int i = 0};${2:i <nprocs};${3:i++}){
+    $0;
+}

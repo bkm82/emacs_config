@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: c_tangle
+# key: <ct
+# --
+#+ATTR_LATEX: :options frame=single
+#+BEGIN_SRC c :exports code :tangle ./CS522_a${1:assignment#}_bkm82/${2:asignment_name}_act${3:act}_bkm82.c
+  $0
+#+END_SRC

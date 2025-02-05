@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Demo
+# key: <demo
+# --
+
+#+BEGIN_SRC
+helo${1:demo}
+#file 
+print("${1}")
+$0
+#+END_SRC
